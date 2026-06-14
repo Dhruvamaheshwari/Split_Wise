@@ -25,10 +25,10 @@ function App() {
         <Route path="/settle" element={<Settle />} />
 
         {/* Default Route */}
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         
         {/* Fallback Route */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
