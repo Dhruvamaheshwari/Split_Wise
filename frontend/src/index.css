@@ -43,7 +43,7 @@ body {
 }
 
 .dark body {
-  background: #0f172a;
+  background: #020617; /* Very deep slate-950 for premium look */
   color: #f8fafc;
 }
 
@@ -71,9 +71,9 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 .dark .daisy-card {
-  background-color: #1e293b;
-  border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  background-color: #0f172a; /* Slate-900 for cards, slightly elevated from background */
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
 }
 
 /* Glassmorphism Utilities */
@@ -86,8 +86,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 .dark .glass-panel {
-  background: rgba(15, 23, 42, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(2, 6, 23, 0.85); /* Slate-950 frosted glass */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .hover-lift {
