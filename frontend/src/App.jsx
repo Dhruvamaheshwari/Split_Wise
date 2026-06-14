@@ -8,6 +8,7 @@ import GroupDetails from './pages/GroupDetails';
 import CreateExpense from './pages/CreateExpense';
 import ExpenseDetails from './pages/ExpenseDetails';
 import Settle from './pages/Settle';
+import { ThemeProvider } from "./context/ThemeContext";
 
 function App() {
   return (
@@ -34,4 +35,10 @@ function App() {
   );
 }
 
-export default App;
+export default function AppWithTheme() {
+  return (
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  );
+}

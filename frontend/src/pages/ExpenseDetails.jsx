@@ -106,31 +106,31 @@ export default function ExpenseDetails() {
               <div className="w-6 h-6 rounded-full bg-[#f8fafc] -mr-7 shadow-inner"></div>
             </div>
 
-            <div className="p-8 pt-6 bg-white">
-              <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
+            <div className="p-8 pt-6 bg-white dark:bg-slate-800">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100 dark:border-slate-700">
                 <div>
-                  <p className="text-sm text-gray-500 font-medium mb-1">Paid by</p>
-                  <p className="font-bold text-gray-900 text-lg flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">Paid by</p>
+                  <p className="font-bold text-gray-900 dark:text-white text-lg flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-primary-100 dark:bg-slate-700 text-primary-700 dark:text-primary-300 flex items-center justify-center text-xs">
                       {expense.paid_by?.username?.charAt(0).toUpperCase() || "U"}
                     </span>
                     {expense.paid_by?.username}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-500 font-medium mb-1">Date</p>
-                  <p className="font-bold text-gray-900 text-lg">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">Date</p>
+                  <p className="font-bold text-gray-900 dark:text-white text-lg">
                     {new Date(expense.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                   </p>
                 </div>
               </div>
 
-              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Split Breakdown</h3>
+              <h3 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-4">Split Breakdown</h3>
               <ul className="space-y-4">
                 {expense.splits.map(split => (
                   <li key={split.user_id} className="flex justify-between items-center">
-                    <span className="text-gray-700 font-semibold text-sm">{split.user?.username || split.user?.email}</span>
-                    <span className="font-mono-num font-extrabold text-gray-900">₹{split.amount_owed.toFixed(2)}</span>
+                    <span className="text-gray-700 dark:text-gray-300 font-semibold text-sm">{split.user?.username || split.user?.email}</span>
+                    <span className="font-mono-num font-extrabold text-gray-900 dark:text-white">₹{split.amount_owed.toFixed(2)}</span>
                   </li>
                 ))}
               </ul>
@@ -139,9 +139,9 @@ export default function ExpenseDetails() {
         </div>
 
         {/* Right Col: Chat */}
-        <Card className="flex flex-col h-[650px]" animate={false}>
-          <div className="p-5 border-b border-gray-100 bg-white/50">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+        <Card className="flex flex-col h-[650px] dark:bg-slate-800" animate={false}>
+          <div className="p-5 border-b border-gray-100 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <span className="relative flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
@@ -150,38 +150,38 @@ export default function ExpenseDetails() {
             </h2>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50 dark:bg-slate-900/20">
             {expense.comments.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-400">
+              <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
                 <p className="text-lg font-medium">No comments yet</p>
                 <p className="text-sm">Start the discussion below!</p>
               </div>
             ) : (
               expense.comments.map(comment => (
-                <div key={comment.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 animate-fade-in">
+                <div key={comment.id} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 animate-fade-in">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-bold text-sm text-primary-600">
+                    <span className="font-bold text-sm text-primary-600 dark:text-primary-400">
                       {comment.user?.username || comment.user?.email}
                     </span>
-                    <span className="text-xs text-gray-400 font-medium">
+                    <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">
                       {new Date(comment.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  <p className="text-gray-800 text-sm leading-relaxed">{comment.content}</p>
+                  <p className="text-gray-800 dark:text-gray-200 text-sm leading-relaxed">{comment.content}</p>
                 </div>
               ))
             )}
             <div ref={commentsEndRef} />
           </div>
 
-          <form onSubmit={handleAddComment} className="p-4 border-t border-gray-100 bg-white">
+          <form onSubmit={handleAddComment} className="p-4 border-t border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800">
             <div className="flex gap-3">
               <input
                 type="text"
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/30 transition-all"
+                className="flex-1 px-4 py-3 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/30 transition-all"
                 disabled={isSubmitting}
               />
               <Button type="submit" disabled={isSubmitting || !newComment.trim()} className="px-6 rounded-xl shadow-md">
