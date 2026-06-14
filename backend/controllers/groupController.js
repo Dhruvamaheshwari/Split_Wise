@@ -164,9 +164,112 @@ const removeGroupMember = async (req, res) => {
   }
 };
 
+const computeBalances = async (groupId) => {
+  // Fetch all expenses with splits
+  const expenses = await prisma.expense.findMany({
+    where: { group_id: groupId },
+    include: { splits: true }
+  });
+
+  // Fetch all settlements
+  const settlements = await prisma.settlement.findMany({
+    where: { group_id: groupId }
+  });
+
+  // debts map: { [fromUserId]: { [toUserId]: amount } }
+  const debts = {};
+
+  const ensureUser = (u) => {
+    if (!debts[u]) debts[u] = {};
+  };
+
+  // 1. Add up all expense splits
+  expenses.forEach(exp => {
+    const paidBy = exp.paid_by_user_id;
+    ensureUser(paidBy);
+
+    exp.splits.forEach(split => {
+      const owedBy = split.user_id;
+      if (owedBy !== paidBy) {
+        ensureUser(owedBy);
+        if (!debts[owedBy][paidBy]) debts[owedBy][paidBy] = 0;
+        debts[owedBy][paidBy] += split.amount_owed;
+      }
+    });
+  });
+
+  // 2. Subtract settlements
+  settlements.forEach(settle => {
+    const paidBy = settle.paid_by_user_id; // the person who owed
+    const paidTo = settle.paid_to_user_id; // the person who was owed
+    ensureUser(paidBy);
+    if (!debts[paidBy][paidTo]) debts[paidBy][paidTo] = 0;
+    debts[paidBy][paidTo] -= settle.amount;
+  });
+
+  // 3. Net out mutual debts
+  const userIds = Object.keys(debts);
+  for (let i = 0; i < userIds.length; i++) {
+    for (let j = i + 1; j < userIds.length; j++) {
+      const userA = userIds[i];
+      const userB = userIds[j];
+
+      const aOwesB = debts[userA]?.[userB] || 0;
+      const bOwesA = debts[userB]?.[userA] || 0;
+
+      const net = aOwesB - bOwesA;
+
+      if (net > 0) {
+        // userA owes userB net
+        if (debts[userA]) debts[userA][userB] = net;
+        if (debts[userB]) debts[userB][userA] = 0;
+      } else if (net < 0) {
+        // userB owes userA abs(net)
+        if (debts[userB]) debts[userB][userA] = Math.abs(net);
+        if (debts[userA]) debts[userA][userB] = 0;
+      } else {
+        // completely settled between A and B
+        if (debts[userA]) debts[userA][userB] = 0;
+        if (debts[userB]) debts[userB][userA] = 0;
+      }
+    }
+  }
+
+  // Convert to array
+  const balanceArray = [];
+  userIds.forEach(fromUser => {
+    const targets = debts[fromUser] || {};
+    Object.keys(targets).forEach(toUser => {
+      if (targets[toUser] > 0.01) { // ignore floating point zeroes
+        balanceArray.push({
+          fromUserId: fromUser,
+          toUserId: toUser,
+          amount: parseFloat(targets[toUser].toFixed(2))
+        });
+      }
+    });
+  });
+
+  return balanceArray;
+};
+
+// @desc    Get exact balances for a group
+// @route   GET /api/groups/:id/balances
+// @access  Private
+const getGroupBalances = async (req, res) => {
+  try {
+    const balances = await computeBalances(req.params.id);
+    res.status(200).json(balances);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error computing balances" });
+  }
+};
+
 module.exports = {
   createGroup,
   getGroups,
   addGroupMember,
   removeGroupMember,
+  getGroupBalances,
 };
