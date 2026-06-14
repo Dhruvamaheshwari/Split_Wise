@@ -1,37 +1,78 @@
 const prisma = require("../config/prisma");
+const pusher = require("../config/pusher");
 
 // @desc    Create a new expense and splits
 // @route   POST /api/expenses
 // @access  Private
 const createExpense = async (req, res) => {
-  const { groupId, amount, description, splits } = req.body;
+  const { groupId, amount, currency = "INR", description, splitType = "EQUAL", splits } = req.body;
   const userId = req.user.id; // From authMiddleware (paid_by_user_id)
 
-  if (!groupId || !amount || !description || !splits || splits.length === 0) {
+  if (!groupId || amount === undefined || !description || !splits || splits.length === 0) {
     return res.status(400).json({ error: "Please provide all required fields" });
   }
 
-  // Validate that the splits add up to the total amount
-  const totalSplits = splits.reduce((acc, split) => acc + split.amount_owed, 0);
+  const parsedAmount = parseFloat(amount);
+  const exchangeRate = currency === "USD" ? 85.0 : 1.0;
+  const baseAmount = parsedAmount * exchangeRate;
+
+  let computedSplits = [];
   
-  // Use an epsilon for floating point comparison
-  if (Math.abs(totalSplits - amount) > 0.01) {
-    return res.status(400).json({ error: "The sum of splits does not equal the total expense amount" });
+  if (splitType === "EQUAL") {
+    const perPerson = baseAmount / splits.length;
+    computedSplits = splits.map(s => ({
+      user_id: s.user_id,
+      amount_owed: perPerson,
+      split_value: null
+    }));
+  } else if (splitType === "PERCENTAGE") {
+    let totalPercentage = splits.reduce((acc, s) => acc + (parseFloat(s.split_value) || 0), 0);
+    if (totalPercentage === 0) totalPercentage = 100; // fallback
+    computedSplits = splits.map(s => ({
+      user_id: s.user_id,
+      amount_owed: baseAmount * ((parseFloat(s.split_value) || 0) / totalPercentage),
+      split_value: parseFloat(s.split_value) || 0
+    }));
+  } else if (splitType === "SHARE") {
+    let totalShares = splits.reduce((acc, s) => acc + (parseFloat(s.split_value) || 0), 0);
+    if (totalShares === 0) totalShares = 1; // fallback
+    computedSplits = splits.map(s => ({
+      user_id: s.user_id,
+      amount_owed: baseAmount * ((parseFloat(s.split_value) || 0) / totalShares),
+      split_value: parseFloat(s.split_value) || 0
+    }));
+  } else if (splitType === "UNEQUAL") {
+    computedSplits = splits.map(s => ({
+      user_id: s.user_id,
+      amount_owed: (parseFloat(s.split_value) || 0) * exchangeRate,
+      split_value: parseFloat(s.split_value) || 0
+    }));
+    
+    // Validate unequal sum matches baseAmount
+    const totalUnequal = computedSplits.reduce((acc, s) => acc + s.amount_owed, 0);
+    if (Math.abs(totalUnequal - baseAmount) > 0.05) {
+      return res.status(400).json({ error: "The sum of unequal splits does not equal the total expense amount" });
+    }
+  } else {
+    return res.status(400).json({ error: "Invalid split type" });
   }
 
   try {
-    // Nested write in Prisma automatically uses a transaction.
-    // This inserts the Expense and all ExpenseSplits securely.
     const expense = await prisma.expense.create({
       data: {
         group_id: groupId,
         paid_by_user_id: userId,
-        amount: parseFloat(amount),
+        amount: baseAmount,
+        original_amount: currency !== "INR" ? parsedAmount : null,
+        currency,
+        exchange_rate: exchangeRate,
+        split_type: splitType,
         description,
         splits: {
-          create: splits.map((split) => ({
+          create: computedSplits.map((split) => ({
             user_id: split.user_id,
-            amount_owed: parseFloat(split.amount_owed),
+            amount_owed: split.amount_owed,
+            split_value: split.split_value,
           })),
         },
       },
@@ -43,7 +84,7 @@ const createExpense = async (req, res) => {
     res.status(201).json(expense);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error creating expense" });
+    res.status(500).json({ error: error.message || "Error creating expense" });
   }
 };
 
@@ -98,6 +139,9 @@ const addComment = async (req, res) => {
         user: { select: { username: true, email: true } }
       }
     });
+
+    // Trigger Pusher event
+    await pusher.trigger(`expense-${expenseId}`, 'new-comment', comment);
 
     res.status(201).json(comment);
   } catch (error) {

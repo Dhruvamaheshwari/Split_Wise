@@ -1,81 +1,97 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import Card from "../components/ui/Card";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
+      // 1. Fetch CSRF Token (Required by Auth.js)
+      const csrfRes = await fetch("http://localhost:3000/api/auth/csrf", { credentials: "include" });
+      const { csrfToken } = await csrfRes.json();
+
+      // 2. Perform Login with the Token
+      const res = await fetch("http://localhost:3000/api/auth/callback/credentials", {
         method: "POST",
-        headers: {
+        headers: { 
           "Content-Type": "application/json",
+          "X-Auth-Return-Redirect": "1"
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, csrfToken, redirect: false, json: true }),
+        credentials: "include"
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to login");
+      
+      // Auth.js returns { url: "..." } on success, or { error: "..." } on failure when redirect: false
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Login failed - Invalid credentials");
       }
 
-      // Store the token in localStorage
-      localStorage.setItem("token", data.session.access_token);
-      
-      // Redirect to dashboard
+      // No need to store token in localStorage; Auth.js uses HttpOnly cookies
       navigate("/dashboard");
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
-        
-        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
+    <div className="min-h-screen flex items-center justify-center p-6 page-enter">
+      <Card className="w-full max-w-md p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Welcome Back</h1>
+          <p className="text-gray-500">Sign in to Splitwise MVP</p>
+        </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
-          <input
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm font-medium animate-fade-in text-center">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin}>
+          <Input
+            label="Email Address"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required
+            placeholder="you@example.com"
           />
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
-          <input
+          <Input
+            label="Password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
             required
+            placeholder="••••••••"
           />
-        </div>
 
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline"
-        >
-          Sign In
-        </button>
+          <Button type="submit" variant="primary" className="w-full mt-4" isLoading={loading}>
+            Sign In
+          </Button>
+        </form>
 
-        <p className="mt-4 text-sm text-center">
-          Don't have an account? <a href="/signup" className="text-blue-500">Sign up</a>
+        <p className="text-center mt-6 text-sm text-gray-600">
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-primary-600 font-semibold hover:underline">
+            Sign up
+          </Link>
         </p>
-      </form>
+      </Card>
     </div>
   );
 }

@@ -1,1 +1,56 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f5f3ff;
+  --color-primary-100: #ede9fe;
+  --color-primary-500: #8b5cf6;
+  --color-primary-600: #7c3aed;
+  
+  --color-glass-bg: rgba(255, 255, 255, 0.85);
+  --color-glass-border: rgba(255, 255, 255, 0.3);
+  
+  --animate-fade-in: fadeIn 0.4s ease-out forwards;
+  --animate-slide-up: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Global Styles */
+body {
+  background: linear-gradient(135deg, #f6f8fd 0%, #f1f5f9 100%);
+  background-attachment: fixed;
+  color: #1e293b;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--color-glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-glass-border);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth Page Transitions */
+.page-enter {
+  opacity: 0;
+  animation: slideUp 0.4s ease-out forwards;
+}

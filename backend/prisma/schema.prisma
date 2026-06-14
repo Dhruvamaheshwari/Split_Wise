@@ -3,24 +3,79 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
+// -------------------------------------
+// Auth.js (NextAuth) Required Models
+// -------------------------------------
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// -------------------------------------
+// Splitwise Clone Application Models
+// -------------------------------------
+
 model User {
-  id                 String           @id @default(uuid())
-  email              String           @unique
-  username           String           @unique
+  id                 String           @id @default(cuid()) // Auth.js prefers cuid for User ID
+  name               String?          // Auth.js standard
+  email              String?          @unique
+  emailVerified      DateTime?        @map("email_verified") // Auth.js standard
+  image              String?          // Auth.js standard
+  password           String?          // Custom: For Credentials provider
+  username           String?          @unique
   created_at         DateTime         @default(now())
 
-  // Relations
+  // Auth.js Relations
+  accounts           Account[]
+  sessions           Session[]
+
+  // App Relations
   group_members      GroupMember[]
   expenses_paid      Expense[]        @relation("ExpensePaidBy")
   splits             ExpenseSplit[]
   settlements_paid   Settlement[]     @relation("SettlementPaidBy")
   settlements_received Settlement[]   @relation("SettlementPaidTo")
   comments           ExpenseComment[]
+
+  @@map("users")
 }
 
 model Group {
@@ -32,6 +87,8 @@ model Group {
   members    GroupMember[]
   expenses   Expense[]
   settlements Settlement[]
+
+  @@map("groups")
 }
 
 model GroupMember {
@@ -45,12 +102,17 @@ model GroupMember {
   group     Group    @relation(fields: [group_id], references: [id], onDelete: Cascade)
 
   @@id([user_id, group_id])
+  @@map("group_members")
 }
 
 model Expense {
   id              String           @id @default(uuid())
   group_id        String
   paid_by_user_id String
+  currency        String           @default("INR")
+  original_amount Float?
+  exchange_rate   Float            @default(1.0)
+  split_type      String           @default("EQUAL")
   amount          Float
   description     String
   created_at      DateTime         @default(now())
@@ -60,11 +122,14 @@ model Expense {
   paid_by         User             @relation("ExpensePaidBy", fields: [paid_by_user_id], references: [id])
   splits          ExpenseSplit[]
   comments        ExpenseComment[]
+
+  @@map("expenses")
 }
 
 model ExpenseSplit {
   expense_id  String
   user_id     String
+  split_value Float?
   amount_owed Float
 
   // Relations
@@ -72,6 +137,7 @@ model ExpenseSplit {
   user        User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@id([expense_id, user_id])
+  @@map("expense_splits")
 }
 
 model ExpenseComment {
@@ -84,6 +150,8 @@ model ExpenseComment {
   // Relations
   expense    Expense @relation(fields: [expense_id], references: [id], onDelete: Cascade)
   user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("expense_comments")
 }
 
 model Settlement {
@@ -98,4 +166,6 @@ model Settlement {
   group            Group    @relation(fields: [group_id], references: [id], onDelete: Cascade)
   paid_by          User     @relation("SettlementPaidBy", fields: [paid_by_user_id], references: [id])
   paid_to          User     @relation("SettlementPaidTo", fields: [paid_to_user_id], references: [id])
+
+  @@map("settlements")
 }

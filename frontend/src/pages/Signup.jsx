@@ -1,93 +1,93 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import Card from "../components/ui/Card";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch("http://localhost:3000/api/auth/signup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, username, password }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, username }),
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Signup failed");
 
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to signup");
-      }
-
-      // Supabase typically requires email verification, so we might want to alert the user
-      alert("Signup successful! Please check your email to verify your account before logging in.");
-      
-      // Redirect to login
+      // After successful signup, redirect to login so they can establish an Auth.js session
       navigate("/login");
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleSignup} className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Sign Up</h2>
-        
-        {error && <p className="text-red-500 mb-4 text-sm">{error}</p>}
-
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            required
-          />
+    <div className="min-h-screen flex items-center justify-center p-6 page-enter">
+      <Card className="w-full max-w-md p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Create Account</h1>
+          <p className="text-gray-500">Join Splitwise MVP</p>
         </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Username</label>
-          <input
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm font-medium animate-fade-in text-center">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSignup}>
+          <Input
+            label="Username"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required
+            placeholder="johndoe"
           />
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Password</label>
-          <input
+          <Input
+            label="Email Address"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="you@example.com"
+          />
+          <Input
+            label="Password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
             required
+            placeholder="••••••••"
           />
-        </div>
 
-        <button
-          type="submit"
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full focus:outline-none focus:shadow-outline"
-        >
-          Sign Up
-        </button>
+          <Button type="submit" variant="primary" className="w-full mt-4" isLoading={loading}>
+            Sign Up
+          </Button>
+        </form>
 
-        <p className="mt-4 text-sm text-center">
-          Already have an account? <a href="/login" className="text-blue-500">Log in</a>
+        <p className="text-center mt-6 text-sm text-gray-600">
+          Already have an account?{" "}
+          <Link to="/login" className="text-primary-600 font-semibold hover:underline">
+            Sign in
+          </Link>
         </p>
-      </form>
+      </Card>
     </div>
   );
 }

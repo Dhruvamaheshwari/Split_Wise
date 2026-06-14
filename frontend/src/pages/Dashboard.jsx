@@ -1,20 +1,24 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Spinner from "../components/ui/Spinner";
 
 export default function Dashboard() {
   const [groups, setGroups] = useState([]);
   const [newGroupName, setNewGroupName] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const navigate = useNavigate();
 
   const fetchGroups = async () => {
     try {
-      const res = await fetch("/api/groups", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      const res = await fetch("http://localhost:3000/api/groups", {
+        credentials: "include",
       });
 
       if (res.status === 401) {
@@ -28,6 +32,8 @@ export default function Dashboard() {
       setGroups(data);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,14 +44,15 @@ export default function Dashboard() {
   const handleCreateGroup = async (e) => {
     e.preventDefault();
     setError("");
+    setIsCreating(true);
 
     try {
-      const res = await fetch("/api/groups", {
+      const res = await fetch("http://localhost:3000/api/groups", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
+        credentials: "include",
         body: JSON.stringify({ name: newGroupName }),
       });
 
@@ -57,78 +64,100 @@ export default function Dashboard() {
       setIsModalOpen(false);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsCreating(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col page-enter">
       <Navbar />
 
-      <main className="max-w-4xl mx-auto p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Your Groups</h1>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
+      <main className="max-w-5xl mx-auto p-6 w-full flex-1">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Your Groups</h1>
+          <Button onClick={() => setIsModalOpen(true)} variant="primary">
             + Create Group
-          </button>
+          </Button>
         </div>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <div className="text-red-500 mb-6 bg-red-50 p-4 rounded-lg">{error}</div>}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {groups.length === 0 ? (
-            <p className="text-gray-500">You are not in any groups yet.</p>
-          ) : (
-            groups.map((group) => (
-              <div
-                key={group.id}
-                onClick={() => navigate(`/group/${group.id}`)}
-                className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-xl font-semibold mb-2">{group.name}</h3>
-                <p className="text-gray-500 text-sm">
-                  {group.members?.length || 0} Members
-                </p>
-                <p className="text-gray-400 text-xs mt-4">
-                  Created {new Date(group.created_at).toLocaleDateString()}
-                </p>
+        {loading ? (
+          <div className="py-20">
+            <Spinner size="lg" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {groups.length === 0 ? (
+              <div className="col-span-full text-center py-16 bg-white/50 rounded-2xl border border-gray-200 border-dashed">
+                <p className="text-gray-500 text-lg">You are not in any groups yet.</p>
+                <Button onClick={() => setIsModalOpen(true)} variant="glass" className="mt-4">
+                  Create your first group
+                </Button>
               </div>
-            ))
-          )}
-        </div>
+            ) : (
+              groups.map((group, idx) => (
+                <Card 
+                  key={group.id} 
+                  hover 
+                  className="p-6 flex flex-col"
+                  style={{ animationDelay: `${idx * 0.1}s` }}
+                >
+                  <div onClick={() => navigate(`/group/${group.id}`)} className="flex-1">
+                    <h3 className="text-xl font-bold text-gray-800 mb-2 truncate">{group.name}</h3>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="flex -space-x-2">
+                        {/* Placeholder avatars for members */}
+                        {group.members?.slice(0,3).map((m, i) => (
+                          <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 border-2 border-white flex items-center justify-center text-xs text-white font-bold">
+                            {(m.user?.username || m.user?.email || '?').charAt(0).toUpperCase()}
+                          </div>
+                        ))}
+                      </div>
+                      <span className="text-gray-500 text-sm font-medium">
+                        {group.members?.length || 0} Members
+                      </span>
+                    </div>
+                  </div>
+                  <div className="pt-4 border-t border-gray-100 mt-auto">
+                    <p className="text-gray-400 text-xs font-medium uppercase tracking-wider">
+                      Created {new Date(group.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        )}
 
         {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-lg shadow-xl w-96">
-              <h2 className="text-2xl font-bold mb-4">Create New Group</h2>
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+            <Card className="w-full max-w-md p-6" animate={false}>
+              <h2 className="text-2xl font-bold mb-6 text-gray-900">Create New Group</h2>
               <form onSubmit={handleCreateGroup}>
-                <input
+                <Input
+                  label="Group Name"
                   type="text"
-                  placeholder="Group Name"
+                  placeholder="e.g., Weekend Trip"
                   value={newGroupName}
                   onChange={(e) => setNewGroupName(e.target.value)}
-                  className="w-full border p-2 rounded mb-4 focus:outline-none focus:border-blue-500"
                   required
                 />
-                <div className="flex justify-end gap-2">
-                  <button
+                <div className="flex justify-end gap-3 mt-8">
+                  <Button
                     type="button"
+                    variant="glass"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
                   >
                     Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
+                  </Button>
+                  <Button type="submit" variant="primary" isLoading={isCreating}>
                     Create
-                  </button>
+                  </Button>
                 </div>
               </form>
-            </div>
+            </Card>
           </div>
         )}
       </main>

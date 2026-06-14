@@ -28,20 +28,21 @@
 ## 4. Technical Architecture (Frontend, Backend, Database)
 - **Database:** PostgreSQL (hosted on Supabase free tier).
 - **Authentication:** Supabase Auth (Email + password only. Separate Signup and Login pages. No social login for MVP).
-- **Real-time:** Supabase Real-time (for chat/expense updates).
+- **Real-time:** Pusher WebSockets (for chat/expense updates).
 - **ORM:** Prisma.
 - **Hosting (Frontend & Backend):** Vercel.
 - **Framework:** Frontend (React + Vite), Backend (Express.js).
 
 ## 5. Data Model & API Design
-**Proposed Prisma Schema:**
-- `User`: `id`, `email`, `username`, `created_at`
-- `Group`: `id`, `name`, `created_at`
-- `GroupMember`: `user_id`, `group_id`, `role` (e.g., creator, member), `joined_at`
-- `Expense`: `id`, `group_id`, `paid_by_user_id`, `amount`, `description`, `created_at` (Note: Editing/Deleting disabled for MVP)
-- `ExpenseSplit`: `expense_id`, `user_id`, `amount_owed` (Calculated on creation to simplify balance math)
-- `Settlement`: `id`, `group_id`, `paid_by_user_id`, `paid_to_user_id`, `amount`, `created_at`
-- `ExpenseComment`: `id`, `expense_id`, `user_id`, `content`, `created_at` (for Real-time Chat)
+**Proposed Prisma Schema (with Neon DB & Auth.js integration):**
+- **Auth.js Core:** `Account` (`accounts`), `Session` (`sessions`), `VerificationToken` (`verification_tokens`)
+- `User` (`users`): `id`, `name`, `email`, `emailVerified`, `image`, `password` (for credentials), `username`, `created_at`
+- `Group` (`groups`): `id`, `name`, `created_at`
+- `GroupMember` (`group_members`): `user_id`, `group_id`, `role`, `joined_at`
+- `Expense` (`expenses`): `id`, `group_id`, `paid_by_user_id`, `amount`, `description`, `created_at`
+- `ExpenseSplit` (`expense_splits`): `expense_id`, `user_id`, `amount_owed`
+- `Settlement` (`settlements`): `id`, `group_id`, `paid_by_user_id`, `paid_to_user_id`, `amount`, `created_at`
+- `ExpenseComment` (`expense_comments`): `id`, `expense_id`, `user_id`, `content`, `created_at`
 
 ## 6. UI Screens & Navigation
 - **Navbar:** Common top navigation with Logout button.
@@ -58,5 +59,35 @@
 
 ## 8. Risks & Tradeoffs
 - **2-Day Timeline Constraints:** Disabling edit/delete for expenses and settlements ensures we can meet the deadline without debugging complex balance recalculation edge cases.
-- **Real-time implementation:** Relying on Supabase Real-time for expense chat avoids the need for a separate WebSocket server.
+- **Real-time implementation:** Relying on Pusher for expense chat provides a standard, decoupled WebSocket integration replacing Supabase Realtime.
 - **Simplified Balances vs Exact Balances:** We are doing exact balances (who owes who) dynamically calculated on read or updated on write, prioritizing simplicity.
+
+## 9. Migration Plan (Neon DB, Auth.js, Pusher)
+**Target Stack Updates:**
+- **Database:** Neon DB (Serverless PostgreSQL)
+- **Authentication:** Migrate from Supabase Auth to Auth.js for Express (`@auth/express`) using the Credentials Provider and `@auth/prisma-adapter`.
+- **Real-time:** Migrate from Supabase Realtime to Pusher (Free Tier) for expense comment chat synchronization.
+
+**Migration Strategy:**
+1. **Database:** Update Prisma configuration to point directly to Neon DB (already in progress via `prisma.config.ts`).
+2. **Authentication:** 
+   - Migration to `@auth/express` is **COMPLETE**.
+   - Supabase Auth has been removed. The app now uses cookie-based sessions with the Auth.js Credentials Provider backed by Prisma and `bcryptjs`.
+3. **Real-time Chat:**
+   - Install `pusher` (backend) and `pusher-js` (frontend).
+   - In `expenseController.js` (addComment), dispatch a Pusher event `new-comment` to the channel `expense-[id]`.
+   - In `ExpenseDetails.jsx`, replace the Supabase WebSocket subscription with a Pusher subscription.
+
+## 10. Known Issues & Edge Cases
+- **Pusher Connection Limits:** The free tier of Pusher is limited to 100 max concurrent connections. If usage exceeds this, real-time comments will fall back to requiring a page refresh.
+- **Concurrent Settlement Conflicts:** If two users try to settle the same debt simultaneously, it may result in double-recording. We do not currently lock the balance engine.
+- **Round-off Errors:** Floating point rounding on splits (e.g. 3-way equal splits of $10.00 = 3.33) leaves $0.01 unassigned. The backend allows a 0.05 epsilon variance.
+
+## 11. CSV Data Testing & Advanced Edge Cases
+**Purpose:** Ensure system stability by testing against a messy, real-world CSV export containing contradictions and missing data.
+**Implemented Edge Case Capabilities:**
+- **Currencies:** `Expense` model now includes `currency`, `original_amount`, and `exchange_rate` fields. USD expenses are converted to base currency (INR) using a fixed 85.0 exchange rate. Balances are computed in the base currency.
+- **Negative Expenses:** Permitted by DB, treated as refunds. The balance algorithm dynamically handles reverse debts.
+- **Settlements in CSV:** Empty `split_type` and targeted `split_with` values denote Settlements, mapped directly to the `Settlement` table rather than `Expense` table.
+- **Split Mathematics:** `ExpenseSplit` now stores `split_value` (the raw percentage or share number). The API computes the exact fiat `amount_owed` dynamically to prevent frontend math tampering.
+- **Contradictory Splits/Math:** Percentage splits totaling >100% are mathematically normalized to 100% via the seed script. Missing `paid_by` are defaulted to the group creator.

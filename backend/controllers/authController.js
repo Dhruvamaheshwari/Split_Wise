@@ -1,63 +1,49 @@
-const supabase = require("../config/supabase");
+const bcrypt = require("bcryptjs");
+const prisma = require("../config/prisma");
 
-// @desc    Register new user
+// @desc    Register a new user
 // @route   POST /api/auth/signup
+// @access  Public
 const signup = async (req, res) => {
   const { email, password, username } = req.body;
 
+  if (!email || !password || !username) {
+    return res.status(400).json({ error: "Please provide all fields" });
+  }
+
   try {
-    // 1. Sign up the user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email,
-      password,
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ email }, { username }]
+      }
     });
 
-    if (authError) throw authError;
+    if (existingUser) {
+      return res.status(400).json({ error: "User with this email or username already exists" });
+    }
 
-    // 2. Note: A Prisma User record should also be created here in a real scenario
-    // (e.g. Prisma.User.create({...})) but for now we focus on Supabase Auth
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    res.status(201).json({ message: "User created successfully", user: authData.user });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
-
-// @desc    Login user
-// @route   POST /api/auth/login
-const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    const user = await prisma.user.create({
+      data: {
+        email,
+        username,
+        password: hashedPassword,
+        name: username
+      }
     });
 
-    if (error) throw error;
-
-    // Supabase returns a session object containing the access_token (JWT)
-    res.status(200).json({ message: "Login successful", session: data.session });
+    res.status(201).json({ message: "User created successfully. Please login." });
   } catch (error) {
-    res.status(401).json({ error: error.message });
+    console.error(error);
+    res.status(500).json({ error: "Error during signup" });
   }
 };
 
-// @desc    Logout user
-// @route   POST /api/auth/logout
-const logout = async (req, res) => {
-  try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-
-    res.status(200).json({ message: "Logout successful" });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+// Login is handled automatically by Auth.js at POST /api/auth/callback/credentials
+// Logout is handled automatically by Auth.js at POST /api/auth/signout
 
 module.exports = {
   signup,
-  login,
-  logout,
 };
