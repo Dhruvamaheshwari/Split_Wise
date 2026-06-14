@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import Pusher from "pusher-js";
+
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import Spinner from "../components/ui/Spinner";
@@ -36,31 +36,12 @@ export default function ExpenseDetails() {
   useEffect(() => {
     fetchExpense();
     
-    if (import.meta.env.VITE_PUSHER_KEY) {
-      try {
-        const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
-          cluster: import.meta.env.VITE_PUSHER_CLUSTER
-        });
-
-        const channel = pusher.subscribe(`expense-${expenseId}`);
-        channel.bind('new-comment', function(data) {
-          fetchExpense();
-        });
-
-        return () => { 
-          pusher.unsubscribe(`expense-${expenseId}`); 
-        };
-      } catch (err) {
-        console.error("Pusher initialization failed:", err);
-      }
-    } else {
-      // Fallback: Poll every 3 seconds if Pusher is not configured
-      const interval = setInterval(() => {
-        fetchExpense();
-      }, 3000);
-      
-      return () => clearInterval(interval);
-    }
+    // Polling every 3 seconds for real-time updates since Pusher is not configured
+    const interval = setInterval(() => {
+      fetchExpense();
+    }, 3000);
+    
+    return () => clearInterval(interval);
   }, [expenseId]);
 
   useEffect(() => {
