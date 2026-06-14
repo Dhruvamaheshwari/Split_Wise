@@ -18,11 +18,11 @@ export default function Login() {
 
     try {
       // 1. Fetch CSRF Token (Required by Auth.js)
-      const csrfRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/csrf`, { credentials: "include" });
+      const csrfRes = await fetch(`/api/auth/csrf`, { credentials: "include" });
       const { csrfToken } = await csrfRes.json();
 
       // 2. Perform Login with the Token
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/callback/credentials`, {
+      const res = await fetch(`/api/auth/callback/credentials`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

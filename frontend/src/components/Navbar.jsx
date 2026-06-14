@@ -24,7 +24,7 @@ export default function Navbar() {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/session`, { credentials: "include" });
+        const res = await fetch(`/api/auth/session`, { credentials: "include" });
         const data = await res.json();
         if (data && data.user) {
           setUser(data.user);
@@ -36,7 +36,7 @@ export default function Navbar() {
 
     const fetchNotifications = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/expenses/notifications/recent`, { credentials: "include" });
+        const res = await fetch(`/api/expenses/notifications/recent`, { credentials: "include" });
         if (res.ok) {
           const data = await res.json();
           setNotifications(data);
@@ -56,10 +56,10 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     // Fetch CSRF Token (Required by Auth.js for signout)
-    const csrfRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/csrf`, { credentials: "include" });
+    const csrfRes = await fetch(`/api/auth/csrf`, { credentials: "include" });
     const { csrfToken } = await csrfRes.json();
 
-    await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/signout`, {
+    await fetch(`/api/auth/signout`, {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",

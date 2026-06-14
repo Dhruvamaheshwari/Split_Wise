@@ -17,7 +17,7 @@ export default function Dashboard() {
 
   const fetchGroups = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups`, {
+      const res = await fetch(`/api/groups`, {
         credentials: "include",
       });
 
@@ -47,7 +47,7 @@ export default function Dashboard() {
     setIsCreating(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups`, {
+      const res = await fetch(`/api/groups`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

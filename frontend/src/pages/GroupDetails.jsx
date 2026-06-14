@@ -24,25 +24,25 @@ export default function GroupDetails() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const groupRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups`, { credentials: "include" });
+        const groupRes = await fetch(`/api/groups`, { credentials: "include" });
         const groupsData = await groupRes.json();
         const currentGroup = groupsData.find(g => g.id === groupId);
         
         if (!currentGroup) throw new Error("Group not found or you don't have access");
         setGroup(currentGroup);
 
-        const balanceRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups/${groupId}/balances`, { credentials: "include" });
+        const balanceRes = await fetch(`/api/groups/${groupId}/balances`, { credentials: "include" });
         const balanceData = await balanceRes.json();
         setBalances(balanceData);
 
-        const expensesRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups/${groupId}/expenses`, { credentials: "include" });
+        const expensesRes = await fetch(`/api/groups/${groupId}/expenses`, { credentials: "include" });
         if (expensesRes.ok) {
           const expensesData = await expensesRes.json();
           setExpenses(expensesData);
         }
 
         try {
-          const sessionRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/session`, { credentials: "include" });
+          const sessionRes = await fetch(`/api/auth/session`, { credentials: "include" });
           const sessionData = await sessionRes.json();
           setCurrentUser(sessionData?.user?.id);
         } catch(e) {}
@@ -63,7 +63,7 @@ export default function GroupDetails() {
     setAddMemberMsg({ text: "", type: "" });
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups/${groupId}/members`, {
+      const res = await fetch(`/api/groups/${groupId}/members`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -80,7 +80,7 @@ export default function GroupDetails() {
       setNewMemberIdentifier("");
       
       // Refresh group data to show new member
-      const groupRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups`, { credentials: "include" });
+      const groupRes = await fetch(`/api/groups`, { credentials: "include" });
       const groupsData = await groupRes.json();
       setGroup(groupsData.find(g => g.id === groupId));
 
@@ -95,7 +95,7 @@ export default function GroupDetails() {
     if (!window.confirm("Are you sure you want to leave this group?")) return;
     
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups/${groupId}/members`, {
+      const res = await fetch(`/api/groups/${groupId}/members`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -116,7 +116,7 @@ export default function GroupDetails() {
     if (!window.confirm("Are you sure you want to remove this member?")) return;
     
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups/${groupId}/members`, {
+      const res = await fetch(`/api/groups/${groupId}/members`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -127,12 +127,12 @@ export default function GroupDetails() {
       if (!res.ok) throw new Error(data.error || "Failed to remove member");
 
       // Refresh group data
-      const groupRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups`, { credentials: "include" });
+      const groupRes = await fetch(`/api/groups`, { credentials: "include" });
       const groupsData = await groupRes.json();
       setGroup(groupsData.find(g => g.id === groupId));
       
       // Also refresh balances
-      const balanceRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups/${groupId}/balances`, { credentials: "include" });
+      const balanceRes = await fetch(`/api/groups/${groupId}/balances`, { credentials: "include" });
       setBalances(await balanceRes.json());
       
     } catch (err) {
