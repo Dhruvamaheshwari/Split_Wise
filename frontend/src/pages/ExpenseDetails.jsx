@@ -20,7 +20,7 @@ export default function ExpenseDetails() {
 
   const fetchExpense = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/expenses/${expenseId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/expenses/${expenseId}`, {
         credentials: "include"
       });
       const data = await res.json();
@@ -72,7 +72,7 @@ export default function ExpenseDetails() {
     if (!newComment.trim()) return;
     setIsSubmitting(true);
     try {
-      const res = await fetch(`http://localhost:3000/api/expenses/${expenseId}/comments`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/expenses/${expenseId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

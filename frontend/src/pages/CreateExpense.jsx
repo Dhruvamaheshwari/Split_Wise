@@ -21,7 +21,7 @@ export default function CreateExpense() {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/groups`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups`, {
           credentials: "include",
         });
         const groups = await res.json();
@@ -81,7 +81,7 @@ export default function CreateExpense() {
     }
 
     try {
-      const res = await fetch("http://localhost:3000/api/expenses", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/expenses`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

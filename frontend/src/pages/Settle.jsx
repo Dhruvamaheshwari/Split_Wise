@@ -27,7 +27,7 @@ export default function Settle() {
       try {
         let currentId = null;
         try {
-          const sessionRes = await fetch("http://localhost:3000/api/auth/session", { credentials: "include" });
+          const sessionRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/auth/session`, { credentials: "include" });
           const sessionData = await sessionRes.json();
           currentId = sessionData?.user?.id;
           if (!currentId) throw new Error("Not authenticated");
@@ -36,14 +36,14 @@ export default function Settle() {
 
         if (!groupId) throw new Error("Group ID is required");
 
-        const groupRes = await fetch(`http://localhost:3000/api/groups`, { credentials: "include" });
+        const groupRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups`, { credentials: "include" });
         const groupsData = await groupRes.json();
         const currentGroup = groupsData.find((g) => g.id === groupId);
 
         if (!currentGroup) throw new Error("Group not found");
         setGroup(currentGroup);
 
-        const balanceRes = await fetch(`http://localhost:3000/api/groups/${groupId}/balances`, { credentials: "include" });
+        const balanceRes = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/groups/${groupId}/balances`, { credentials: "include" });
         setBalances(await balanceRes.json());
       } catch (err) {
         setError(err.message);
@@ -66,7 +66,7 @@ export default function Settle() {
     const paidToUserId = paymentDirection === "I_PAID" ? selectedUser : currentUser;
 
     try {
-      const res = await fetch("http://localhost:3000/api/settlements", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/settlements`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
