@@ -1,13 +1,15 @@
 
-const Credentials = require("@auth/core/providers/credentials").default;
-const { PrismaAdapter } = require("@auth/prisma-adapter");
 const bcrypt = require("bcryptjs");
 const prisma = require("./prisma");
 
-const authConfig = {
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    Credentials({
+const getAuthConfig = async () => {
+  const { PrismaAdapter } = await import("@auth/prisma-adapter");
+  const Credentials = (await import("@auth/core/providers/credentials")).default;
+
+  return {
+    adapter: PrismaAdapter(prisma),
+    providers: [
+      Credentials({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" }
@@ -50,8 +52,9 @@ const authConfig = {
       return session;
     }
   },
-  secret: process.env.AUTH_SECRET || "fallback_secret_key_change_me_in_production",
-  trustHost: true
+    secret: process.env.AUTH_SECRET || "fallback_secret_key_change_me_in_production",
+    trustHost: true
+  };
 };
 
-module.exports = { authConfig };
+module.exports = { getAuthConfig };

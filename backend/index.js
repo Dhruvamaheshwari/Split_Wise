@@ -6,7 +6,7 @@ const port = 3000;
 // Import Routes
 const authRoutes = require("./routes/authRoutes");
 const { protect } = require("./middleware/authMiddleware");
-const { authConfig } = require("./config/auth");
+const { getAuthConfig } = require("./config/auth");
 const cors = require("cors");
 
 // Middleware
@@ -27,6 +27,7 @@ app.use("/api/auth", authRoutes);
 // Mount Auth.js for Express using dynamic import to fix ERR_REQUIRE_ESM
 app.use("/api/auth", async (req, res, next) => {
   const { ExpressAuth } = await import("@auth/express");
+  const authConfig = await getAuthConfig();
   return ExpressAuth(authConfig)(req, res, next);
 });
 

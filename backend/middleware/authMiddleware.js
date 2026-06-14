@@ -1,10 +1,10 @@
-const { authConfig } = require("../config/auth");
-
+const { getAuthConfig } = require("../config/auth");
 
 const protect = async (req, res, next) => {
   try {
     // getSession uses the request cookies/headers to verify the session
     const { getSession } = await import("@auth/express");
+    const authConfig = await getAuthConfig();
     const session = await getSession(req, authConfig);
     
     if (!session || !session.user) {
