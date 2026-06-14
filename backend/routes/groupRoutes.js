@@ -11,5 +11,6 @@ router.get("/", groupController.getGroups);
 router.post("/:id/members", groupController.addGroupMember);
 router.delete("/:id/members", groupController.removeGroupMember);
 router.get("/:id/balances", groupController.getGroupBalances);
+router.get("/:id/expenses", groupController.getGroupExpenses);
 
 module.exports = router;

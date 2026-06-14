@@ -270,10 +270,30 @@ const getGroupBalances = async (req, res) => {
   }
 };
 
+// @desc    Get all expenses for a group
+// @route   GET /api/groups/:id/expenses
+// @access  Private
+const getGroupExpenses = async (req, res) => {
+  try {
+    const expenses = await prisma.expense.findMany({
+      where: { group_id: req.params.id },
+      include: {
+        paid_by: { select: { username: true, email: true } },
+      },
+      orderBy: { created_at: "desc" },
+    });
+    res.status(200).json(expenses);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching group expenses" });
+  }
+};
+
 module.exports = {
   createGroup,
   getGroups,
   addGroupMember,
   removeGroupMember,
   getGroupBalances,
+  getGroupExpenses,
 };

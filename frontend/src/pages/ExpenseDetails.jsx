@@ -36,19 +36,24 @@ export default function ExpenseDetails() {
   useEffect(() => {
     fetchExpense();
     
-    const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
-      cluster: import.meta.env.VITE_PUSHER_CLUSTER
-    });
+    if (import.meta.env.VITE_PUSHER_KEY) {
+      try {
+        const pusher = new Pusher(import.meta.env.VITE_PUSHER_KEY, {
+          cluster: import.meta.env.VITE_PUSHER_CLUSTER
+        });
 
-    const channel = pusher.subscribe(`expense-${expenseId}`);
-    channel.bind('new-comment', function(data) {
-      // Re-fetch expense to get the new comment with relations
-      fetchExpense();
-    });
+        const channel = pusher.subscribe(`expense-${expenseId}`);
+        channel.bind('new-comment', function(data) {
+          fetchExpense();
+        });
 
-    return () => { 
-      pusher.unsubscribe(`expense-${expenseId}`); 
-    };
+        return () => { 
+          pusher.unsubscribe(`expense-${expenseId}`); 
+        };
+      } catch (err) {
+        console.error("Pusher initialization failed:", err);
+      }
+    }
   }, [expenseId]);
 
   useEffect(() => {

@@ -11,6 +11,7 @@ export default function GroupDetails() {
 
   const [group, setGroup] = useState(null);
   const [balances, setBalances] = useState([]);
+  const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
@@ -33,6 +34,12 @@ export default function GroupDetails() {
         const balanceRes = await fetch(`http://localhost:3000/api/groups/${groupId}/balances`, { credentials: "include" });
         const balanceData = await balanceRes.json();
         setBalances(balanceData);
+
+        const expensesRes = await fetch(`http://localhost:3000/api/groups/${groupId}/expenses`, { credentials: "include" });
+        if (expensesRes.ok) {
+          const expensesData = await expensesRes.json();
+          setExpenses(expensesData);
+        }
 
         try {
           const sessionRes = await fetch("http://localhost:3000/api/auth/session", { credentials: "include" });
@@ -124,6 +131,7 @@ export default function GroupDetails() {
   });
 
   const netBalance = userTotalOwedByOthers - userTotalOwedToOthers;
+  const totalGroupExpenses = expenses.reduce((acc, exp) => acc + exp.amount, 0);
 
   return (
     <div className="min-h-screen flex flex-col page-enter">
@@ -255,6 +263,51 @@ export default function GroupDetails() {
                 Only the group creator can add members. Users must already have an account.
               </p>
             </form>
+          </Card>
+        </div>
+
+        {/* Expenses List */}
+        <div className="mt-8">
+          <Card className="p-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wider text-xs">Group Expenses</h2>
+              <div className="text-right">
+                <span className="text-sm text-gray-500 font-medium">Total Spent: </span>
+                <span className="text-xl font-extrabold text-gray-900">${totalGroupExpenses.toFixed(2)}</span>
+              </div>
+            </div>
+            
+            {expenses.length === 0 ? (
+              <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                <p className="text-gray-500 italic">No expenses recorded yet.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {expenses.map((exp) => (
+                  <div key={exp.id} className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/expense/${exp.id}`)}>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg">
+                        {new Date(exp.created_at).getDate()}
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-gray-900 text-base">{exp.description}</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          Paid by <span className="font-semibold text-gray-700">{exp.paid_by?.username || exp.paid_by?.email}</span> on {new Date(exp.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-extrabold text-gray-900 text-lg">
+                        ${exp.amount.toFixed(2)}
+                      </div>
+                      <div className="text-xs text-gray-400 font-medium mt-0.5 uppercase tracking-wide">
+                        {exp.split_type}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
         </div>
       </main>
