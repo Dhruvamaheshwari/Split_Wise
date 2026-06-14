@@ -84,8 +84,8 @@ export default function GroupDetails() {
   }, [groupId]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [messages.length]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
