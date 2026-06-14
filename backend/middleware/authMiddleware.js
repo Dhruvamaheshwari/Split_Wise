@@ -1,4 +1,3 @@
-const { getSession } = require("@auth/express");
 const { authConfig } = require("../config/auth");
 
 const protect = async (req, res, next) => {
