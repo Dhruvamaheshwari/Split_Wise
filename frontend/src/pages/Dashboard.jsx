@@ -75,16 +75,17 @@ export default function Dashboard() {
 
       <main className="max-w-5xl mx-auto p-6 w-full flex-1">
         {/* FinTech Header Banner */}
-        <div className="mb-10 bg-gradient-to-r from-primary-900 to-primary-600 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+        <div className="mb-10 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-primary-900 rounded-[2.5rem] p-8 sm:p-10 text-white shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500 opacity-20 rounded-full blur-[80px] -mr-10 -mt-10"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500 opacity-10 rounded-full blur-[60px] -ml-10 -mb-10"></div>
           <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
             <div>
-              <h1 className="text-3xl font-extrabold tracking-tight mb-2">My Groups</h1>
-              <p className="text-primary-100 font-medium">Manage your shared expenses and balances</p>
+              <h1 className="text-4xl font-extrabold tracking-tight mb-2 drop-shadow-md">My Groups</h1>
+              <p className="text-primary-200 font-medium">Manage your shared expenses and balances</p>
             </div>
-            <Button onClick={() => setIsModalOpen(true)} className="bg-white text-primary-900 hover:bg-gray-50 border-0 shadow-lg font-bold px-6 py-3 rounded-xl transition-all hover:scale-105">
+            <button onClick={() => setIsModalOpen(true)} className="bg-white text-gray-900 hover:bg-gray-100 shadow-xl font-bold px-7 py-3 rounded-2xl transition-transform hover:-translate-y-1">
               + New Group
-            </Button>
+            </button>
           </div>
         </div>
 

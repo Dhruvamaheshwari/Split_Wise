@@ -136,78 +136,60 @@ export default function GroupDetails() {
   return (
     <div className="min-h-screen flex flex-col page-enter">
       <Navbar />
-      <main className="max-w-5xl mx-auto p-6 w-full flex-1">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-8 gap-4">
-          <div>
-            <Button variant="glass" onClick={() => navigate('/dashboard')} className="mb-4 text-xs px-3 py-1">
-              &larr; Back to Dashboard
-            </Button>
-            <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">{group.name}</h1>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Button variant="secondary" onClick={() => navigate(`/group/${groupId}/expense/new`)}>
-              Add Expense
-            </Button>
-            <Button variant="primary" onClick={() => navigate(`/settle?group=${groupId}`)}>
-              Settle Up
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          {/* Individual Summary Card */}
-          <Card className="col-span-1 p-6 bg-gradient-to-br from-white to-gray-50 border-t-4 border-t-primary-500">
-            <h2 className="text-lg font-bold text-gray-800 mb-4 uppercase tracking-wider text-xs">Your Balance</h2>
-            <div className={`text-3xl font-extrabold mb-2 ${netBalance > 0 ? 'text-emerald-600' : netBalance < 0 ? 'text-rose-600' : 'text-gray-400'}`}>
-              {netBalance > 0 ? `+ $${netBalance.toFixed(2)}` : netBalance < 0 ? `- $${Math.abs(netBalance).toFixed(2)}` : "Settled up"}
-            </div>
-            {netBalance !== 0 && (
-              <p className="text-gray-500 text-sm font-medium mb-6">
-                {netBalance > 0 ? "You are owed overall" : "You owe overall"}
-              </p>
-            )}
-            
-            <div className="space-y-3 pt-4 border-t border-gray-100">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">You owe:</span>
-                <span className="font-bold text-rose-500">${userTotalOwedToOthers.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">You are owed:</span>
-                <span className="font-bold text-emerald-500">${userTotalOwedByOthers.toFixed(2)}</span>
-              </div>
-            </div>
       <main className="max-w-4xl mx-auto p-6 w-full flex-1">
         {/* Passbook Header Banner */}
-        <div className="mb-8 bg-gradient-to-r from-primary-900 to-primary-800 rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden">
-          <div className="absolute -top-10 -right-10 w-48 h-48 bg-white opacity-5 rounded-full blur-2xl"></div>
-          <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
+        <div className="mb-8 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-primary-900 rounded-[2.5rem] p-8 sm:p-10 text-white shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500 opacity-20 rounded-full blur-[80px] -mr-10 -mt-10"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500 opacity-10 rounded-full blur-[60px] -ml-10 -mb-10"></div>
+          <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-8">
             <div>
-              <Button variant="glass" onClick={() => navigate("/dashboard")} className="mb-4 text-xs px-3 py-1 bg-white/10 hover:bg-white/20 border-0 text-white rounded-full">
+              <button onClick={() => navigate("/dashboard")} className="mb-4 text-xs font-semibold px-4 py-1.5 bg-white/20 hover:bg-white/30 text-white rounded-full backdrop-blur-sm transition-colors border border-white/30">
                 &larr; Back to Dashboard
-              </Button>
-              <h1 className="text-4xl font-extrabold tracking-tight mb-2 drop-shadow-sm">{group.name}</h1>
-              <p className="text-primary-200 font-medium text-sm flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-400"></span>
+              </button>
+              <div className="flex items-center gap-4 mb-2">
+                <h1 className="text-4xl font-extrabold tracking-tight drop-shadow-sm">{group.name}</h1>
+              </div>
+              <p className="text-primary-200 font-medium text-sm flex items-center gap-2 mb-8">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 Active Group
               </p>
+              
+              <div className="flex flex-wrap gap-4 mt-2">
+                <button onClick={() => navigate(`/group/${groupId}/expense/new`)} className="bg-white text-gray-900 hover:bg-gray-100 shadow-xl font-bold px-7 py-3 rounded-2xl transition-transform hover:-translate-y-1">
+                  Add Expense
+                </button>
+                <button onClick={() => navigate(`/settle?group=${groupId}`)} className="bg-primary-500 hover:bg-primary-400 border border-primary-400 text-white shadow-xl font-bold px-7 py-3 rounded-2xl transition-transform hover:-translate-y-1">
+                  Settle Up
+                </button>
+              </div>
             </div>
             
-            <div className="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/20 sm:min-w-[200px]">
-              <p className="text-primary-100 text-xs font-bold uppercase tracking-wider mb-1">My Net Balance</p>
+            <div className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 sm:min-w-[260px] shadow-2xl">
+              <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-3">My Net Balance</p>
               {netBalance === 0 ? (
-                <p className="text-3xl font-black text-white">Settled Up</p>
+                <p className="text-3xl font-black text-white mb-5">Settled Up</p>
               ) : netBalance > 0 ? (
-                <div>
-                  <p className="text-3xl font-black text-green-400">₹{netBalance.toFixed(2)}</p>
-                  <p className="text-xs text-green-200 mt-1 font-medium">You will get</p>
+                <div className="mb-5">
+                  <p className="text-4xl font-black text-emerald-400 drop-shadow-md">₹{netBalance.toFixed(2)}</p>
+                  <p className="text-sm text-emerald-300/80 mt-1.5 font-medium">You will get overall</p>
                 </div>
               ) : (
-                <div>
-                  <p className="text-3xl font-black text-red-400">₹{Math.abs(netBalance).toFixed(2)}</p>
-                  <p className="text-xs text-red-200 mt-1 font-medium">You need to pay</p>
+                <div className="mb-5">
+                  <p className="text-4xl font-black text-rose-400 drop-shadow-md">₹{Math.abs(netBalance).toFixed(2)}</p>
+                  <p className="text-sm text-rose-300/80 mt-1.5 font-medium">You need to pay</p>
                 </div>
               )}
+              
+              <div className="space-y-3 pt-5 border-t border-white/10 mt-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-sm font-medium">You owe:</span>
+                  <span className="font-bold text-rose-400 text-sm">₹{userTotalOwedToOthers.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-400 text-sm font-medium">You get:</span>
+                  <span className="font-bold text-emerald-400 text-sm">₹{userTotalOwedByOthers.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
