@@ -20,7 +20,7 @@ This document serves as the comprehensive execution blueprint for building the S
 ---
 
 ## 2. Technical Architecture & Tech Stack
-- **Frontend & Backend Framework:** Next.js (App Router)
+- **Frontend & Backend Framework:** Frontend (React + Vite), Backend (Express.js)
 - **Database:** PostgreSQL (Relational)
 - **Database Hosting & Auth & Real-time:** Supabase (Free Tier)
 - **ORM:** Prisma
@@ -78,7 +78,7 @@ model Settlement {
   created_at       DateTime @default(now())
 }
 
-model Message {
+model ExpenseComment {
   id         String   @id @default(uuid())
   expense_id String
   user_id    String
@@ -89,7 +89,7 @@ model Message {
 
 ---
 
-## 4. API Design (Next.js Server Actions)
+## 4. API Design (Express.js Routes)
 - `searchUsers(query)`: Finds users by email or username.
 - `createGroup(name)`: Creates group, assigns creator role.
 - `addGroupMember(groupId, userId)`: Adds a searched user.
@@ -111,7 +111,7 @@ model Message {
 - **`/group/[id]/expense/new`**: Form to create an expense and define splits.
 - **`/expense/[id]`**: Expense detail view displaying:
   - The split breakdown
-  - Real-time chat (Supabase Real-time channel for `Message` inserts).
+  - Real-time chat (Supabase Real-time channel for `ExpenseComment` inserts).
 - **`/settle`**: Form to record a settlement payment.
 
 ---
@@ -121,7 +121,7 @@ model Message {
 2. **Supabase Configuration:** 
    - Apply Prisma migrations to the Supabase Postgres instance.
    - Configure Supabase Auth providers (Email).
-   - Enable Supabase Real-time on the `Message` table.
+   - Enable Supabase Real-time on the `ExpenseComment` table.
 3. **Vercel Deployment:**
    - Import Git repository to Vercel.
    - Configure environment variables (`DATABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).

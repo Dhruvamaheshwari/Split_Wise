@@ -31,7 +31,7 @@
 - **Real-time:** Supabase Real-time (for chat/expense updates).
 - **ORM:** Prisma.
 - **Hosting (Frontend & Backend):** Vercel.
-- **Framework:** Next.js (assumed, given Vercel + Backend API, but to be confirmed).
+- **Framework:** Frontend (React + Vite), Backend (Express.js).
 
 ## 5. Data Model & API Design
 **Proposed Prisma Schema:**
@@ -41,7 +41,7 @@
 - `Expense`: `id`, `group_id`, `paid_by_user_id`, `amount`, `description`, `created_at` (Note: Editing/Deleting disabled for MVP)
 - `ExpenseSplit`: `expense_id`, `user_id`, `amount_owed` (Calculated on creation to simplify balance math)
 - `Settlement`: `id`, `group_id`, `paid_by_user_id`, `paid_to_user_id`, `amount`, `created_at`
-- `Message`: `id`, `expense_id`, `user_id`, `content`, `created_at` (for Real-time Chat)
+- `ExpenseComment`: `id`, `expense_id`, `user_id`, `content`, `created_at` (for Real-time Chat)
 
 ## 6. UI Screens & Navigation
 - **Navbar:** Common top navigation with Logout button.

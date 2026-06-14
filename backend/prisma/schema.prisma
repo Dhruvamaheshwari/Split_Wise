@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String           @id @default(uuid())
+  email              String           @unique
+  username           String           @unique
+  created_at         DateTime         @default(now())
+
+  // Relations
+  group_members      GroupMember[]
+  expenses_paid      Expense[]        @relation("ExpensePaidBy")
+  splits             ExpenseSplit[]
+  settlements_paid   Settlement[]     @relation("SettlementPaidBy")
+  settlements_received Settlement[]   @relation("SettlementPaidTo")
+  comments           ExpenseComment[]
+}
+
+model Group {
+  id         String        @id @default(uuid())
+  name       String
+  created_at DateTime      @default(now())
+
+  // Relations
+  members    GroupMember[]
+  expenses   Expense[]
+  settlements Settlement[]
+}
+
+model GroupMember {
+  user_id   String
+  group_id  String
+  role      String   // 'creator' | 'member'
+  joined_at DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  group     Group    @relation(fields: [group_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, group_id])
+}
+
+model Expense {
+  id              String           @id @default(uuid())
+  group_id        String
+  paid_by_user_id String
+  amount          Float
+  description     String
+  created_at      DateTime         @default(now())
+
+  // Relations
+  group           Group            @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  paid_by         User             @relation("ExpensePaidBy", fields: [paid_by_user_id], references: [id])
+  splits          ExpenseSplit[]
+  comments        ExpenseComment[]
+}
+
+model ExpenseSplit {
+  expense_id  String
+  user_id     String
+  amount_owed Float
+
+  // Relations
+  expense     Expense @relation(fields: [expense_id], references: [id], onDelete: Cascade)
+  user        User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@id([expense_id, user_id])
+}
+
+model ExpenseComment {
+  id         String   @id @default(uuid())
+  expense_id String
+  user_id    String
+  content    String
+  created_at DateTime @default(now())
+
+  // Relations
+  expense    Expense @relation(fields: [expense_id], references: [id], onDelete: Cascade)
+  user       User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Settlement {
+  id               String   @id @default(uuid())
+  group_id         String
+  paid_by_user_id  String
+  paid_to_user_id  String
+  amount           Float
+  created_at       DateTime @default(now())
+
+  // Relations
+  group            Group    @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  paid_by          User     @relation("SettlementPaidBy", fields: [paid_by_user_id], references: [id])
+  paid_to          User     @relation("SettlementPaidTo", fields: [paid_to_user_id], references: [id])
+}
