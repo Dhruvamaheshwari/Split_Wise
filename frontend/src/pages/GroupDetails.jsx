@@ -84,6 +84,27 @@ export default function GroupDetails() {
     }
   };
 
+  const handleLeaveGroup = async () => {
+    if (!window.confirm("Are you sure you want to leave this group?")) return;
+    
+    try {
+      const res = await fetch(`http://localhost:3000/api/groups/${groupId}/members`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ targetUserId: currentUser })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to leave group");
+
+      // Redirect to dashboard on successful leave
+      navigate("/dashboard");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50"><Spinner size="lg" /></div>
   );
@@ -188,9 +209,19 @@ export default function GroupDetails() {
                     </div>
                     <span className="font-medium text-gray-800">{m.user?.username || m.user?.email}</span>
                   </div>
-                  {m.role === "creator" && (
-                    <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">Creator</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {m.role === "creator" && (
+                      <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">Creator</span>
+                    )}
+                    {m.user_id === currentUser && (
+                      <button 
+                        onClick={handleLeaveGroup}
+                        className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                      >
+                        Leave
+                      </button>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>

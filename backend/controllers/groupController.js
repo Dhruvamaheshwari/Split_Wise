@@ -122,13 +122,17 @@ const removeGroupMember = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    // Check if requester is the creator
     const requesterMember = await prisma.groupMember.findUnique({
       where: { user_id_group_id: { user_id: userId, group_id: groupId } },
     });
 
-    if (!requesterMember || requesterMember.role !== "creator") {
-      return res.status(403).json({ error: "Only the group creator can remove members" });
+    if (!requesterMember) {
+      return res.status(403).json({ error: "You are not a member of this group" });
+    }
+
+    // Allow removal if requester is creator, OR if the requester is leaving themselves
+    if (requesterMember.role !== "creator" && targetUserId !== userId) {
+      return res.status(403).json({ error: "Only the group creator can remove other members" });
     }
 
     // Check if member has pending balance (assuming a function exists or querying ExpenseSplit)
