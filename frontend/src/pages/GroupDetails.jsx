@@ -195,7 +195,9 @@ export default function GroupDetails() {
             </div>
             
             <div className="bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/10 sm:min-w-[260px] shadow-2xl">
-              <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-3">My Net Balance</p>
+              <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-3">
+                {netBalance > 0 ? "To Receive" : netBalance < 0 ? "You Owe" : "Status"}
+              </p>
               {netBalance === 0 ? (
                 <p className="text-3xl font-black text-white mb-5">Settled Up</p>
               ) : netBalance > 0 ? (
@@ -240,19 +242,71 @@ export default function GroupDetails() {
                 </div>
               ) : (
                 <ul className="space-y-4">
-                  {balances.map((b, i) => (
-                    <li key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs">
-                          {getUserName(b.fromUserId)[0].toUpperCase()}
+                  {group.members?.map((m) => {
+                    const memberDebts = balances.filter(b => b.fromUserId === m.user_id);
+                    const memberCredits = balances.filter(b => b.toUserId === m.user_id);
+
+                    if (memberDebts.length > 0) {
+                      return memberDebts.map((debt, idx) => (
+                        <li key={`debt-${m.user_id}-${idx}`} className="flex items-center justify-between p-4 bg-rose-50/30 rounded-xl border border-rose-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs">
+                              {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
+                            </div>
+                            <span className="text-gray-600 font-medium text-sm">
+                              <span className="font-bold text-gray-900">{m.user?.username || m.user?.email}</span> owes <span className="font-bold text-gray-900">{getUserName(debt.toUserId)}</span>
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-mono-num font-black text-rose-600 text-lg mb-1">₹{debt.amount.toFixed(2)}</div>
+                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-rose-500 bg-rose-100 px-2 py-0.5 rounded-full">
+                              Not Paid ❌
+                            </span>
+                          </div>
+                        </li>
+                      ));
+                    }
+
+                    if (memberCredits.length > 0) {
+                      const totalCredit = memberCredits.reduce((sum, b) => sum + b.amount, 0);
+                      return (
+                        <li key={`credit-${m.user_id}`} className="flex items-center justify-between p-4 bg-blue-50/30 rounded-xl border border-blue-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                              {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
+                            </div>
+                            <span className="text-gray-600 font-medium text-sm">
+                              <span className="font-bold text-gray-900">{m.user?.username || m.user?.email}</span> (Owed money)
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-mono-num font-black text-blue-600 text-lg mb-1">₹{totalCredit.toFixed(2)}</div>
+                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-blue-500 bg-blue-100 px-2 py-0.5 rounded-full">
+                              Receiving ⏳
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    }
+
+                    return (
+                      <li key={`settled-${m.user_id}`} className="flex items-center justify-between p-4 bg-emerald-50/30 rounded-xl border border-emerald-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                            {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
+                          </div>
+                          <span className="font-bold text-gray-900 text-sm">
+                            {m.user?.username || m.user?.email}
+                          </span>
                         </div>
-                        <span className="text-gray-600 font-medium text-sm">
-                          <span className="font-bold text-gray-900">{getUserName(b.fromUserId)}</span> owes <span className="font-bold text-gray-900">{getUserName(b.toUserId)}</span>
-                        </span>
-                      </div>
-                      <span className="font-mono-num font-black text-gray-900 text-lg">₹{b.amount.toFixed(2)}</span>
-                    </li>
-                  ))}
+                        <div className="text-right">
+                          <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full">
+                            Paid ✅
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
           </Card>

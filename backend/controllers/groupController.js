@@ -135,27 +135,16 @@ const removeGroupMember = async (req, res) => {
       return res.status(403).json({ error: "Only the group creator can remove other members" });
     }
 
-    // Check if member has pending balance (assuming a function exists or querying ExpenseSplit)
-    // For MVP, we prevent deleting if they owe or are owed money in this group
-    const balances = await prisma.expenseSplit.aggregate({
-      where: { 
-        user_id: targetUserId,
-        expense: { group_id: groupId }
-      },
-      _sum: { amount_owed: true }
-    });
+    // Compute net balances for the group
+    const balances = await computeBalances(groupId);
+    
+    // Check if the target user has any non-zero balance (they owe or are owed)
+    const hasUnsettledBalances = balances.some(b => 
+      b.fromUserId === targetUserId || b.toUserId === targetUserId
+    );
 
-    // Need to factor in settlements as well. For now, simple check.
-    // If they have any active expense splits, prevent deletion.
-    const splitCount = await prisma.expenseSplit.count({
-      where: {
-        user_id: targetUserId,
-        expense: { group_id: groupId }
-      }
-    });
-
-    if (splitCount > 0) {
-      return res.status(400).json({ error: "Cannot remove member with active expenses in the group" });
+    if (hasUnsettledBalances) {
+      return res.status(400).json({ error: "Cannot remove member with unsettled balances in the group" });
     }
 
     await prisma.groupMember.delete({
