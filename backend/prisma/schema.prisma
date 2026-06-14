@@ -74,6 +74,7 @@ model User {
   settlements_paid   Settlement[]     @relation("SettlementPaidBy")
   settlements_received Settlement[]   @relation("SettlementPaidTo")
   comments           ExpenseComment[]
+  group_messages     GroupMessage[]
 
   @@map("users")
 }
@@ -87,6 +88,7 @@ model Group {
   members    GroupMember[]
   expenses   Expense[]
   settlements Settlement[]
+  messages   GroupMessage[]
 
   @@map("groups")
 }
@@ -168,4 +170,18 @@ model Settlement {
   paid_to          User     @relation("SettlementPaidTo", fields: [paid_to_user_id], references: [id])
 
   @@map("settlements")
+}
+
+model GroupMessage {
+  id         String   @id @default(uuid())
+  group_id   String
+  user_id    String
+  content    String
+  created_at DateTime @default(now())
+
+  // Relations
+  group      Group    @relation(fields: [group_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("group_messages")
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Card from "../components/ui/Card";
@@ -16,10 +16,28 @@ export default function GroupDetails() {
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   
+  // Chat state
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const messagesEndRef = useRef(null);
+  
   // Add member state
   const [newMemberIdentifier, setNewMemberIdentifier] = useState("");
   const [addingMember, setAddingMember] = useState(false);
   const [addMemberMsg, setAddMemberMsg] = useState({ text: "", type: "" });
+
+  const fetchMessages = async () => {
+    try {
+      const msgRes = await fetch(`/api/groups/${groupId}/messages`, { credentials: "include" });
+      if (msgRes.ok) {
+        const msgData = await msgRes.json();
+        setMessages(msgData);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,6 +59,8 @@ export default function GroupDetails() {
           setExpenses(expensesData);
         }
 
+        await fetchMessages();
+
         try {
           const sessionRes = await fetch(`/api/auth/session`, { credentials: "include" });
           const sessionData = await sessionRes.json();
@@ -54,7 +74,40 @@ export default function GroupDetails() {
       }
     };
     fetchData();
+
+    // Auto-refresh messages every 3 seconds
+    const interval = setInterval(() => {
+      fetchMessages();
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, [groupId]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+    setIsSending(true);
+    try {
+      const res = await fetch(`/api/groups/${groupId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content: newMessage })
+      });
+      if (res.ok) {
+        setNewMessage("");
+        await fetchMessages();
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   const handleAddMember = async (e) => {
     e.preventDefault();
@@ -339,7 +392,7 @@ export default function GroupDetails() {
 
         {/* Group Members List & Add Member */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="p-6">
+          <Card className="p-6 md:h-[650px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
             <h2 className="text-lg font-bold text-gray-800 mb-4 uppercase tracking-wider text-xs">Group Members</h2>
             <ul className="space-y-3">
               {group.members?.map((m) => (
@@ -377,7 +430,8 @@ export default function GroupDetails() {
             </ul>
           </Card>
 
-          <Card className="p-6">
+          <div className="flex flex-col gap-6 md:h-[650px]">
+          <Card className="p-6 flex-shrink-0">
             <h2 className="text-lg font-bold text-gray-800 mb-4 uppercase tracking-wider text-xs">Add New Member</h2>
             <form onSubmit={handleAddMember} className="space-y-4">
               {addMemberMsg.text && (
@@ -406,6 +460,69 @@ export default function GroupDetails() {
               </p>
             </form>
           </Card>
+
+          {/* Live Discussion Chat */}
+          <Card className="p-6 flex flex-col h-[400px]">
+            <h2 className="text-lg font-bold text-gray-800 mb-4 uppercase tracking-wider text-xs flex items-center justify-between">
+              Live Discussion
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+            </h2>
+            
+            <div className="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 scrollbar-thin scrollbar-thumb-gray-200">
+              {messages.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-gray-400 text-sm font-medium">
+                  Be the first to say hello! 👋
+                </div>
+              ) : (
+                messages.map((msg) => {
+                  const isMe = msg.user_id === currentUser;
+                  return (
+                    <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                      <div className="flex items-end gap-2 max-w-[85%]">
+                        {!isMe && (
+                          <div className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 flex-shrink-0 flex items-center justify-center text-[10px] font-bold">
+                            {(msg.user?.username || msg.user?.email || "?")[0].toUpperCase()}
+                          </div>
+                        )}
+                        <div className={`p-3 rounded-2xl text-sm ${isMe ? 'bg-primary-600 text-white rounded-br-sm' : 'bg-gray-100 text-gray-800 rounded-bl-sm'}`}>
+                          <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                        </div>
+                      </div>
+                      <span className={`text-[10px] text-gray-400 mt-1 font-medium ${isMe ? 'mr-1' : 'ml-8'}`}>
+                        {isMe ? 'You' : msg.user?.username || msg.user?.email?.split('@')[0]} • {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            <form onSubmit={handleSendMessage} className="flex gap-2 mt-auto">
+              <input
+                type="text"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder="Type a message..."
+                className="flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm bg-gray-50 transition-all hover:bg-white"
+              />
+              <button
+                type="submit"
+                disabled={isSending || !newMessage.trim()}
+                className="w-10 h-10 rounded-full bg-primary-600 hover:bg-primary-700 text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
+              >
+                {isSending ? <Spinner size="sm" color="white" /> : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transform translate-x-px" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                  </svg>
+                )}
+              </button>
+            </form>
+          </Card>
+          </div>
         </div>
 
         <div className="mt-8">

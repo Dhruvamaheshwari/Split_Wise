@@ -279,6 +279,59 @@ const getGroupExpenses = async (req, res) => {
   }
 };
 
+// @desc    Get group messages
+// @route   GET /api/groups/:id/messages
+// @access  Private
+const getGroupMessages = async (req, res) => {
+  const { id: groupId } = req.params;
+
+  try {
+    const messages = await prisma.groupMessage.findMany({
+      where: { group_id: groupId },
+      orderBy: { created_at: "asc" },
+      include: {
+        user: { select: { username: true, email: true } },
+      },
+    });
+
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching group messages" });
+  }
+};
+
+// @desc    Add a group message
+// @route   POST /api/groups/:id/messages
+// @access  Private
+const addGroupMessage = async (req, res) => {
+  const { id: groupId } = req.params;
+  const { content } = req.body;
+  const userId = req.user.id;
+
+  if (!content) {
+    return res.status(400).json({ error: "Message content is required" });
+  }
+
+  try {
+    const message = await prisma.groupMessage.create({
+      data: {
+        group_id: groupId,
+        user_id: userId,
+        content,
+      },
+      include: {
+        user: { select: { username: true, email: true } },
+      },
+    });
+
+    res.status(201).json(message);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error adding group message" });
+  }
+};
+
 module.exports = {
   createGroup,
   getGroups,
@@ -286,4 +339,6 @@ module.exports = {
   removeGroupMember,
   getGroupBalances,
   getGroupExpenses,
+  getGroupMessages,
+  addGroupMessage,
 };
