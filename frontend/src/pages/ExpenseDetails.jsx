@@ -53,6 +53,13 @@ export default function ExpenseDetails() {
       } catch (err) {
         console.error("Pusher initialization failed:", err);
       }
+    } else {
+      // Fallback: Poll every 3 seconds if Pusher is not configured
+      const interval = setInterval(() => {
+        fetchExpense();
+      }, 3000);
+      
+      return () => clearInterval(interval);
     }
   }, [expenseId]);
 
@@ -73,6 +80,9 @@ export default function ExpenseDetails() {
       });
       if (!res.ok) throw new Error("Failed to add comment");
       setNewComment("");
+      
+      // Fetch expense immediately so the message shows up instantly for the sender
+      await fetchExpense();
     } catch (err) {
       alert(err.message);
     } finally {

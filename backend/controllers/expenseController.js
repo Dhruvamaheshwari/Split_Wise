@@ -140,8 +140,14 @@ const addComment = async (req, res) => {
       }
     });
 
-    // Trigger Pusher event
-    await pusher.trigger(`expense-${expenseId}`, 'new-comment', comment);
+    // Trigger Pusher event gracefully
+    try {
+      if (process.env.PUSHER_APP_ID && process.env.PUSHER_SECRET) {
+        await pusher.trigger(`expense-${expenseId}`, 'new-comment', comment);
+      }
+    } catch (pusherErr) {
+      console.error("Pusher failed but comment saved:", pusherErr);
+    }
 
     res.status(201).json(comment);
   } catch (error) {
