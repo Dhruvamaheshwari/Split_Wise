@@ -53,7 +53,28 @@ const getAuthConfig = async () => {
     }
   },
     secret: process.env.AUTH_SECRET || "fallback_secret_key_change_me_in_production",
-    trustHost: true
+    trustHost: true,
+    useSecureCookies: true,
+    cookies: {
+      sessionToken: {
+        name: `__Secure-authjs.session-token`,
+        options: {
+          httpOnly: true,
+          sameSite: "none",
+          path: "/",
+          secure: true,
+        },
+      },
+      csrfToken: {
+        name: `__Host-authjs.csrf-token`,
+        options: {
+          httpOnly: true,
+          sameSite: "none",
+          path: "/",
+          secure: true,
+        },
+      },
+    }
   };
 };
 
