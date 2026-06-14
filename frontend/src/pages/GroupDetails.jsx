@@ -177,30 +177,69 @@ export default function GroupDetails() {
                 <span className="font-bold text-emerald-500">${userTotalOwedByOthers.toFixed(2)}</span>
               </div>
             </div>
-          </Card>
+      <main className="max-w-4xl mx-auto p-6 w-full flex-1">
+        {/* Passbook Header Banner */}
+        <div className="mb-8 bg-gradient-to-r from-primary-900 to-primary-800 rounded-[2rem] p-8 text-white shadow-xl relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-48 h-48 bg-white opacity-5 rounded-full blur-2xl"></div>
+          <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-6">
+            <div>
+              <Button variant="glass" onClick={() => navigate("/dashboard")} className="mb-4 text-xs px-3 py-1 bg-white/10 hover:bg-white/20 border-0 text-white rounded-full">
+                &larr; Back to Dashboard
+              </Button>
+              <h1 className="text-4xl font-extrabold tracking-tight mb-2 drop-shadow-sm">{group.name}</h1>
+              <p className="text-primary-200 font-medium text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-400"></span>
+                Active Group
+              </p>
+            </div>
+            
+            <div className="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/20 sm:min-w-[200px]">
+              <p className="text-primary-100 text-xs font-bold uppercase tracking-wider mb-1">My Net Balance</p>
+              {netBalance === 0 ? (
+                <p className="text-3xl font-black text-white">Settled Up</p>
+              ) : netBalance > 0 ? (
+                <div>
+                  <p className="text-3xl font-black text-green-400">₹{netBalance.toFixed(2)}</p>
+                  <p className="text-xs text-green-200 mt-1 font-medium">You will get</p>
+                </div>
+              ) : (
+                <div>
+                  <p className="text-3xl font-black text-red-400">₹{Math.abs(netBalance).toFixed(2)}</p>
+                  <p className="text-xs text-red-200 mt-1 font-medium">You need to pay</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Group-wise Balance Card */}
           <Card className="col-span-1 lg:col-span-2 p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-6 uppercase tracking-wider text-xs">All Group Balances</h2>
+            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Settlement Summary</h2>
             {balances.length === 0 ? (
-              <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                <p className="text-gray-500 italic">Everyone is perfectly settled up!</p>
-              </div>
-            ) : (
-              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {balances.map((balance, idx) => (
-                  <li key={idx} className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-gray-900">{getUserName(balance.fromUserId)}</span>
-                      <span className="text-gray-400 text-xs mt-1">owes {getUserName(balance.toUserId)}</span>
-                    </div>
-                    <span className="font-extrabold text-rose-500 text-lg">
-                      ${balance.amount.toFixed(2)}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+                <div className="flex flex-col items-center justify-center py-8">
+                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-3">
+                    <span className="text-2xl">✨</span>
+                  </div>
+                  <p className="text-gray-600 font-medium">All balances are settled up!</p>
+                </div>
+              ) : (
+                <ul className="space-y-4">
+                  {balances.map((b, i) => (
+                    <li key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xs">
+                          {getUserName(b.fromUserId)[0].toUpperCase()}
+                        </div>
+                        <span className="text-gray-600 font-medium text-sm">
+                          <span className="font-bold text-gray-900">{getUserName(b.fromUserId)}</span> owes <span className="font-bold text-gray-900">{getUserName(b.toUserId)}</span>
+                        </span>
+                      </div>
+                      <span className="font-black text-gray-900 text-lg">₹{b.amount.toFixed(2)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
           </Card>
         </div>
 
@@ -266,41 +305,42 @@ export default function GroupDetails() {
           </Card>
         </div>
 
-        {/* Expenses List */}
         <div className="mt-8">
-          <Card className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wider text-xs">Group Expenses</h2>
-              <div className="text-right">
-                <span className="text-sm text-gray-500 font-medium">Total Spent: </span>
-                <span className="text-xl font-extrabold text-gray-900">₹{totalGroupExpenses.toFixed(2)}</span>
+          <Card className="p-6 overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-8 gap-4">
+              <h2 className="text-lg font-black text-gray-900 uppercase tracking-wide">Passbook</h2>
+              <div className="bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 flex items-center gap-3">
+                <span className="text-sm text-gray-500 font-bold">Total Group Spends</span>
+                <span className="text-xl font-black text-primary-600">₹{totalGroupExpenses.toFixed(2)}</span>
               </div>
             </div>
             
             {expenses.length === 0 ? (
-              <div className="text-center py-10 bg-gray-50 rounded-lg border border-dashed border-gray-200">
-                <p className="text-gray-500 italic">No expenses recorded yet.</p>
+              <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                <p className="text-gray-500 font-medium">No transactions yet.</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {expenses.map((exp) => (
-                  <div key={exp.id} className="flex justify-between items-center bg-white p-4 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/expense/${exp.id}`)}>
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg">
-                        {new Date(exp.created_at).getDate()}
+                  <div key={exp.id} className="group relative flex justify-between items-center bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-primary-100 transition-all cursor-pointer overflow-hidden" onClick={() => navigate(`/expense/${exp.id}`)}>
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="flex items-center gap-5">
+                      <div className="w-12 h-12 rounded-2xl bg-gray-50 text-primary-600 flex flex-col items-center justify-center font-bold shadow-sm group-hover:bg-primary-50 transition-colors">
+                        <span className="text-xs font-semibold uppercase text-gray-400">{new Date(exp.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+                        <span className="text-lg leading-none mt-0.5">{new Date(exp.created_at).getDate()}</span>
                       </div>
                       <div>
-                        <h3 className="font-bold text-gray-900 text-base">{exp.description}</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          Paid by <span className="font-semibold text-gray-700">{exp.paid_by?.username || exp.paid_by?.email}</span> on {new Date(exp.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        <h3 className="font-extrabold text-gray-900 text-lg group-hover:text-primary-700 transition-colors">{exp.description}</h3>
+                        <p className="text-sm text-gray-500 mt-0.5 font-medium">
+                          Paid by <span className="font-bold text-gray-700">{exp.paid_by?.username || exp.paid_by?.email}</span>
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-extrabold text-gray-900 text-lg">
+                      <div className="font-black text-gray-900 text-xl">
                         {exp.currency === "USD" ? "$" : "₹"}{(exp.original_amount || exp.amount).toFixed(2)}
                       </div>
-                      <div className="text-xs text-gray-400 font-medium mt-0.5 uppercase tracking-wide">
+                      <div className="inline-block px-2 py-0.5 mt-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider rounded-md">
                         {exp.split_type}
                       </div>
                     </div>

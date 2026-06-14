@@ -98,37 +98,62 @@ export default function ExpenseDetails() {
       <Navbar />
       <main className="max-w-6xl mx-auto p-6 w-full flex-1 grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* Left Col: Details */}
+        {/* Left Col: Receipt Detail */}
         <div className="animate-slide-up">
           <Button variant="glass" onClick={() => navigate(`/group/${expense.group_id}`)} className="mb-6 text-xs px-3 py-1">
             &larr; Back to Group
           </Button>
 
-          <Card className="p-8">
-            <div className="mb-8">
-              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{expense.description}</h1>
-              <p className="text-5xl font-black text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400 mb-4">
-                {expense.currency === "USD" ? "$" : "₹"}{(expense.original_amount || expense.amount).toFixed(2)}
-              </p>
-              <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
-                <div className="w-6 h-6 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold">
-                  {expense.paid_by?.username?.charAt(0).toUpperCase() || "U"}
-                </div>
-                <span className="text-sm font-medium text-gray-700">
-                  Paid by <span className="font-bold">{expense.paid_by?.username}</span> on {new Date(expense.created_at).toLocaleDateString()}
-                </span>
+          <Card className="p-0 overflow-hidden border-0 shadow-2xl rounded-3xl relative">
+            <div className="bg-primary-600 p-8 text-center text-white">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white/10">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                </svg>
               </div>
+              <p className="text-primary-100 font-medium mb-1">Paid Successfully</p>
+              <h1 className="text-5xl font-black mb-4 tracking-tight">
+                {expense.currency === "USD" ? "$" : "₹"}{(expense.original_amount || expense.amount).toFixed(2)}
+              </h1>
+              <h2 className="text-xl font-bold text-white/90">{expense.description}</h2>
+            </div>
+            
+            {/* Perforated edge effect */}
+            <div className="flex justify-between items-center -mt-3 z-10 relative px-4">
+              <div className="w-6 h-6 rounded-full bg-[#f8fafc] -ml-7 shadow-inner"></div>
+              <div className="flex-1 border-t-2 border-dashed border-gray-300/50 mx-2"></div>
+              <div className="w-6 h-6 rounded-full bg-[#f8fafc] -mr-7 shadow-inner"></div>
             </div>
 
-            <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest border-b pb-2 mb-4">Split Breakdown</h3>
-            <ul className="space-y-3">
-              {expense.splits.map(split => (
-                <li key={split.user_id} className="flex justify-between items-center bg-gray-50/50 p-3 rounded-lg border border-gray-100">
-                  <span className="text-gray-800 font-semibold">{split.user?.username || split.user?.email}</span>
-                  <span className="font-extrabold text-gray-900">₹{split.amount_owed.toFixed(2)}</span>
-                </li>
-              ))}
-            </ul>
+            <div className="p-8 pt-6 bg-white">
+              <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-100">
+                <div>
+                  <p className="text-sm text-gray-500 font-medium mb-1">Paid by</p>
+                  <p className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs">
+                      {expense.paid_by?.username?.charAt(0).toUpperCase() || "U"}
+                    </span>
+                    {expense.paid_by?.username}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-gray-500 font-medium mb-1">Date</p>
+                  <p className="font-bold text-gray-900 text-lg">
+                    {new Date(expense.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                  </p>
+                </div>
+              </div>
+
+              <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Split Breakdown</h3>
+              <ul className="space-y-4">
+                {expense.splits.map(split => (
+                  <li key={split.user_id} className="flex justify-between items-center">
+                    <span className="text-gray-700 font-semibold text-sm">{split.user?.username || split.user?.email}</span>
+                    <span className="font-extrabold text-gray-900">₹{split.amount_owed.toFixed(2)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </Card>
         </div>
 
