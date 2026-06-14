@@ -15,6 +15,9 @@
   
   --animate-fade-in: fadeIn 0.4s ease-out forwards;
   --animate-slide-up: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  
+  --font-heading: 'Montserrat', system-ui, sans-serif;
+  --font-mono-num: 'Roboto Mono', monospace;
 }
 
 @keyframes fadeIn {
@@ -34,6 +37,30 @@ body {
   color: #0f172a;
   font-family: 'Outfit', system-ui, -apple-system, sans-serif;
   letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+  font-family: var(--font-heading);
+  letter-spacing: -0.03em;
+}
+
+.font-mono-num {
+  font-family: var(--font-mono-num);
+  letter-spacing: -0.05em;
+}
+
+/* DaisyUI-inspired utilities */
+.daisy-card {
+  background-color: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: all 0.2s ease-in-out;
+}
+.daisy-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
 /* Glassmorphism Utilities */

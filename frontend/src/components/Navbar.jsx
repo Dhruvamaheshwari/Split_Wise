@@ -74,7 +74,7 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 glass-panel shadow-sm">
       <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-        <Link to="/dashboard" className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400">
+        <Link to="/dashboard" className="font-heading text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400 tracking-tight">
           Splitwise MVP
         </Link>
         <div className="flex items-center gap-4 relative">

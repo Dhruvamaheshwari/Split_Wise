@@ -147,7 +147,7 @@ export default function GroupDetails() {
                 &larr; Back to Dashboard
               </button>
               <div className="flex items-center gap-4 mb-2">
-                <h1 className="text-4xl font-extrabold tracking-tight drop-shadow-sm">{group.name}</h1>
+                <h1 className="font-heading text-4xl font-extrabold tracking-tight drop-shadow-sm">{group.name}</h1>
               </div>
               <p className="text-primary-200 font-medium text-sm flex items-center gap-2 mb-8">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -170,12 +170,12 @@ export default function GroupDetails() {
                 <p className="text-3xl font-black text-white mb-5">Settled Up</p>
               ) : netBalance > 0 ? (
                 <div className="mb-5">
-                  <p className="text-4xl font-black text-emerald-400 drop-shadow-md">₹{netBalance.toFixed(2)}</p>
+                  <p className="font-mono-num text-4xl font-black text-emerald-400 drop-shadow-md">₹{netBalance.toFixed(2)}</p>
                   <p className="text-sm text-emerald-300/80 mt-1.5 font-medium">You will get overall</p>
                 </div>
               ) : (
                 <div className="mb-5">
-                  <p className="text-4xl font-black text-rose-400 drop-shadow-md">₹{Math.abs(netBalance).toFixed(2)}</p>
+                  <p className="font-mono-num text-4xl font-black text-rose-400 drop-shadow-md">₹{Math.abs(netBalance).toFixed(2)}</p>
                   <p className="text-sm text-rose-300/80 mt-1.5 font-medium">You need to pay</p>
                 </div>
               )}
@@ -183,11 +183,11 @@ export default function GroupDetails() {
               <div className="space-y-3 pt-5 border-t border-white/10 mt-2">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400 text-sm font-medium">You owe:</span>
-                  <span className="font-bold text-rose-400 text-sm">₹{userTotalOwedToOthers.toFixed(2)}</span>
+                  <span className="font-mono-num font-bold text-rose-400 text-sm">₹{userTotalOwedToOthers.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-400 text-sm font-medium">You get:</span>
-                  <span className="font-bold text-emerald-400 text-sm">₹{userTotalOwedByOthers.toFixed(2)}</span>
+                  <span className="font-mono-num font-bold text-emerald-400 text-sm">₹{userTotalOwedByOthers.toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -217,7 +217,7 @@ export default function GroupDetails() {
                           <span className="font-bold text-gray-900">{getUserName(b.fromUserId)}</span> owes <span className="font-bold text-gray-900">{getUserName(b.toUserId)}</span>
                         </span>
                       </div>
-                      <span className="font-black text-gray-900 text-lg">₹{b.amount.toFixed(2)}</span>
+                      <span className="font-mono-num font-black text-gray-900 text-lg">₹{b.amount.toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
@@ -290,10 +290,10 @@ export default function GroupDetails() {
         <div className="mt-8">
           <Card className="p-6 overflow-hidden">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-8 gap-4">
-              <h2 className="text-lg font-black text-gray-900 uppercase tracking-wide">Passbook</h2>
+              <h2 className="font-heading text-xl font-black text-gray-900 uppercase tracking-wide">Passbook</h2>
               <div className="bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 flex items-center gap-3">
                 <span className="text-sm text-gray-500 font-bold">Total Group Spends</span>
-                <span className="text-xl font-black text-primary-600">₹{totalGroupExpenses.toFixed(2)}</span>
+                <span className="font-mono-num text-xl font-black text-primary-600">₹{totalGroupExpenses.toFixed(2)}</span>
               </div>
             </div>
             
@@ -319,7 +319,7 @@ export default function GroupDetails() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="font-black text-gray-900 text-xl">
+                      <div className="font-mono-num font-black text-gray-900 text-xl">
                         {exp.currency === "USD" ? "$" : "₹"}{(exp.original_amount || exp.amount).toFixed(2)}
                       </div>
                       <div className="inline-block px-2 py-0.5 mt-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider rounded-md">

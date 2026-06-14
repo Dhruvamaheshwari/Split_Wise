@@ -80,7 +80,7 @@ export default function Dashboard() {
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500 opacity-10 rounded-full blur-[60px] -ml-10 -mb-10"></div>
           <div className="relative z-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
             <div>
-              <h1 className="text-4xl font-extrabold tracking-tight mb-2 drop-shadow-md">My Groups</h1>
+              <h1 className="font-heading text-4xl font-extrabold tracking-tight mb-2 drop-shadow-md">My Groups</h1>
               <p className="text-primary-200 font-medium">Manage your shared expenses and balances</p>
             </div>
             <button onClick={() => setIsModalOpen(true)} className="bg-white text-gray-900 hover:bg-gray-100 shadow-xl font-bold px-7 py-3 rounded-2xl transition-transform hover:-translate-y-1">
@@ -121,11 +121,11 @@ export default function Dashboard() {
                       <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-primary-50 transition-colors">
                         <span className="text-xl font-black text-primary-600">{group.name.charAt(0).toUpperCase()}</span>
                       </div>
-                      <span className="text-xs font-bold bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+                      <span className="font-mono-num text-xs font-bold bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
                         {group.members?.length || 0} Members
                       </span>
                     </div>
-                    <h3 className="text-xl font-extrabold text-gray-900 mb-4 truncate group-hover:text-primary-600 transition-colors">{group.name}</h3>
+                    <h3 className="font-heading text-xl font-extrabold text-gray-900 mb-4 truncate group-hover:text-primary-600 transition-colors">{group.name}</h3>
                     
                     <div className="flex -space-x-3 mb-6">
                       {group.members?.slice(0, 4).map((m, i) => (

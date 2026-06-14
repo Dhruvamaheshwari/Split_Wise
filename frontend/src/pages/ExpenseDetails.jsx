@@ -112,10 +112,10 @@ export default function ExpenseDetails() {
                 </svg>
               </div>
               <p className="text-primary-100 font-medium mb-1">Paid Successfully</p>
-              <h1 className="text-5xl font-black mb-4 tracking-tight">
+              <h1 className="font-mono-num text-5xl font-black mb-4 tracking-tight">
                 {expense.currency === "USD" ? "$" : "₹"}{(expense.original_amount || expense.amount).toFixed(2)}
               </h1>
-              <h2 className="text-xl font-bold text-white/90">{expense.description}</h2>
+              <h2 className="font-heading text-xl font-bold text-white/90">{expense.description}</h2>
             </div>
             
             {/* Perforated edge effect */}
@@ -149,7 +149,7 @@ export default function ExpenseDetails() {
                 {expense.splits.map(split => (
                   <li key={split.user_id} className="flex justify-between items-center">
                     <span className="text-gray-700 font-semibold text-sm">{split.user?.username || split.user?.email}</span>
-                    <span className="font-extrabold text-gray-900">₹{split.amount_owed.toFixed(2)}</span>
+                    <span className="font-mono-num font-extrabold text-gray-900">₹{split.amount_owed.toFixed(2)}</span>
                   </li>
                 ))}
               </ul>
