@@ -18,6 +18,9 @@ app.use("/api/groups", groupRoutes);
 const expenseRoutes = require("./routes/expenseRoutes");
 app.use("/api/expenses", expenseRoutes);
 
+const settlementRoutes = require("./routes/settlementRoutes");
+app.use("/api/settlements", settlementRoutes);
+
 // Example protected route
 app.get("/api/protected", protect, (req, res) => {
   res.json({ message: "You are accessing a protected route!", user: req.user });
