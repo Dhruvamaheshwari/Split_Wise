@@ -7,6 +7,7 @@ const { protect } = require("../middleware/authMiddleware");
 router.use(protect);
 
 router.post("/", expenseController.createExpense);
+router.get("/notifications/recent", expenseController.getRecentComments);
 router.get("/:id", expenseController.getExpense);
 router.post("/:id/comments", expenseController.addComment);
 

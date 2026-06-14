@@ -156,8 +156,46 @@ const addComment = async (req, res) => {
   }
 };
 
+// @desc    Get recent comments for notifications
+// @route   GET /api/expenses/notifications/recent
+// @access  Private
+const getRecentComments = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    // Get all groups the user is part of
+    const userGroups = await prisma.groupMember.findMany({
+      where: { user_id: userId },
+      select: { group_id: true }
+    });
+    
+    const groupIds = userGroups.map(g => g.group_id);
+
+    const recentComments = await prisma.expenseComment.findMany({
+      where: {
+        user_id: { not: userId }, // Exclude own comments
+        expense: {
+          group_id: { in: groupIds }
+        }
+      },
+      orderBy: { created_at: "desc" },
+      take: 10,
+      include: {
+        user: { select: { username: true, email: true } },
+        expense: { select: { description: true } }
+      }
+    });
+
+    res.status(200).json(recentComments);
+  } catch (error) {
+    console.error("Error fetching recent comments:", error);
+    res.status(500).json({ error: "Error fetching recent comments" });
+  }
+};
+
 module.exports = {
   createExpense,
   getExpense,
   addComment,
+  getRecentComments
 };
