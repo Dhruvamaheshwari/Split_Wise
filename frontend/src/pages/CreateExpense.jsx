@@ -137,7 +137,9 @@ export default function CreateExpense() {
                   <option value="USD">USD</option>
                 </select>
                 <div className="relative flex-1">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-xl">$</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-xl">
+                    {currency === "INR" ? "₹" : "$"}
+                  </span>
                   <input
                     type="number"
                     step="0.01"
@@ -187,7 +189,7 @@ export default function CreateExpense() {
                           placeholder="0"
                         />
                         <span className="absolute right-0 top-1.5 text-gray-400 font-bold">
-                          {splitType === "PERCENTAGE" ? "%" : splitType === "SHARE" ? "" : "$"}
+                          {splitType === "PERCENTAGE" ? "%" : splitType === "SHARE" ? "" : (currency === "INR" ? "₹" : "$")}
                         </span>
                       </div>
                     </div>
