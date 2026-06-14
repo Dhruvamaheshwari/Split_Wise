@@ -112,6 +112,34 @@ export default function GroupDetails() {
     }
   };
 
+  const handleRemoveMember = async (targetUserId) => {
+    if (!window.confirm("Are you sure you want to remove this member?")) return;
+    
+    try {
+      const res = await fetch(`http://localhost:3000/api/groups/${groupId}/members`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ targetUserId })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to remove member");
+
+      // Refresh group data
+      const groupRes = await fetch("http://localhost:3000/api/groups", { credentials: "include" });
+      const groupsData = await groupRes.json();
+      setGroup(groupsData.find(g => g.id === groupId));
+      
+      // Also refresh balances
+      const balanceRes = await fetch(`http://localhost:3000/api/groups/${groupId}/balances`, { credentials: "include" });
+      setBalances(await balanceRes.json());
+      
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50"><Spinner size="lg" /></div>
   );
@@ -121,6 +149,8 @@ export default function GroupDetails() {
     const member = group.members?.find(m => m.user_id === userId);
     return member?.user?.username || member?.user?.email || "Unknown User";
   };
+
+  const isCreator = group?.members?.find(m => m.user_id === currentUser)?.role === 'creator';
 
   let userTotalOwedToOthers = 0;
   let userTotalOwedByOthers = 0;
@@ -199,11 +229,14 @@ export default function GroupDetails() {
           <Card className="col-span-1 lg:col-span-2 p-6">
             <h2 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">Settlement Summary</h2>
             {balances.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-3">
-                    <span className="text-2xl">✨</span>
+                <div className="flex flex-col items-center justify-center py-12 px-4 bg-emerald-50/50 rounded-2xl border border-emerald-100 border-dashed">
+                  <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-emerald-50">
+                    <svg className="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
-                  <p className="text-gray-600 font-medium">All balances are settled up!</p>
+                  <h3 className="font-heading text-xl font-black text-gray-900 mb-1">All Settled Up!</h3>
+                  <p className="text-gray-500 font-medium text-sm">Everyone is square. No pending balances in this group.</p>
                 </div>
               ) : (
                 <ul className="space-y-4">
@@ -240,15 +273,24 @@ export default function GroupDetails() {
                   </div>
                   <div className="flex items-center gap-2">
                     {m.role === "creator" && (
-                      <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full font-bold">Creator</span>
+                      <span className="bg-amber-100 text-amber-800 text-[10px] uppercase tracking-wider px-2 py-1 rounded-md font-bold">Creator</span>
                     )}
-                    {m.user_id === currentUser && (
+                    {m.user_id === currentUser ? (
                       <button 
                         onClick={handleLeaveGroup}
-                        className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                        className="text-xs font-bold text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-1 rounded-md transition-colors"
                       >
                         Leave
                       </button>
+                    ) : (
+                      isCreator && (
+                        <button 
+                          onClick={() => handleRemoveMember(m.user_id)}
+                          className="text-xs font-bold text-gray-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded-md transition-colors"
+                        >
+                          Remove
+                        </button>
+                      )
                     )}
                   </div>
                 </li>
