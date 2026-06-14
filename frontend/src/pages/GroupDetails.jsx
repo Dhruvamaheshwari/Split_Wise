@@ -289,6 +289,31 @@ export default function GroupDetails() {
                       );
                     }
 
+                    const hasParticipated = expenses.some(exp => 
+                      exp.paid_by_user_id === m.user_id || 
+                      (exp.splits && exp.splits.some(split => split.user_id === m.user_id))
+                    );
+
+                    if (!hasParticipated) {
+                      return (
+                        <li key={`new-${m.user_id}`} className="flex items-center justify-between p-4 bg-purple-50/30 rounded-xl border border-purple-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs">
+                              {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
+                            </div>
+                            <span className="font-bold text-gray-900 text-sm">
+                              {m.user?.username || m.user?.email}
+                            </span>
+                          </div>
+                          <div className="text-right">
+                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-purple-600 bg-purple-100 px-2 py-0.5 rounded-full">
+                              New Member 
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    }
+
                     return (
                       <li key={`settled-${m.user_id}`} className="flex items-center justify-between p-4 bg-emerald-50/30 rounded-xl border border-emerald-100">
                         <div className="flex items-center gap-3">

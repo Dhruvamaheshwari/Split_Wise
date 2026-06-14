@@ -268,6 +268,7 @@ const getGroupExpenses = async (req, res) => {
       where: { group_id: req.params.id },
       include: {
         paid_by: { select: { username: true, email: true } },
+        splits: true,
       },
       orderBy: { created_at: "desc" },
     });
