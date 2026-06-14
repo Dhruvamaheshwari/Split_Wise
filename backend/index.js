@@ -6,7 +6,7 @@ const port = 3000;
 // Import Routes
 const authRoutes = require("./routes/authRoutes");
 const { protect } = require("./middleware/authMiddleware");
-const { ExpressAuth, authConfig } = require("./config/auth");
+const { authConfig } = require("./config/auth");
 const cors = require("cors");
 
 // Middleware
@@ -24,8 +24,11 @@ app.set('trust proxy', 1);
 // Custom Auth Routes (Signup) MUST come first so Auth.js doesn't throw UnknownAction
 app.use("/api/auth", authRoutes);
 
-// Mount Auth.js for Express (handles /api/auth/callback/credentials, etc.)
-app.use("/api/auth", ExpressAuth(authConfig));
+// Mount Auth.js for Express using dynamic import to fix ERR_REQUIRE_ESM
+app.use("/api/auth", async (req, res, next) => {
+  const { ExpressAuth } = await import("@auth/express");
+  return ExpressAuth(authConfig)(req, res, next);
+});
 
 const groupRoutes = require("./routes/groupRoutes");
 app.use("/api/groups", groupRoutes);

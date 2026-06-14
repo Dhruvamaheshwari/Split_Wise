@@ -1,4 +1,4 @@
-const { ExpressAuth } = require("@auth/express");
+
 const Credentials = require("@auth/core/providers/credentials").default;
 const { PrismaAdapter } = require("@auth/prisma-adapter");
 const bcrypt = require("bcryptjs");
@@ -54,4 +54,4 @@ const authConfig = {
   trustHost: true
 };
 
-module.exports = { authConfig, ExpressAuth };
+module.exports = { authConfig };
