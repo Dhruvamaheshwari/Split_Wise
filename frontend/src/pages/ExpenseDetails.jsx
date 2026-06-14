@@ -108,7 +108,7 @@ export default function ExpenseDetails() {
             <div className="mb-8">
               <h1 className="text-3xl font-extrabold text-gray-900 mb-2">{expense.description}</h1>
               <p className="text-5xl font-black text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-400 mb-4">
-                ${expense.amount.toFixed(2)}
+                {expense.currency === "USD" ? "$" : "₹"}{(expense.original_amount || expense.amount).toFixed(2)}
               </p>
               <div className="inline-flex items-center gap-2 bg-gray-100 px-3 py-1.5 rounded-full">
                 <div className="w-6 h-6 rounded-full bg-primary-500 text-white flex items-center justify-center text-xs font-bold">
@@ -125,7 +125,7 @@ export default function ExpenseDetails() {
               {expense.splits.map(split => (
                 <li key={split.user_id} className="flex justify-between items-center bg-gray-50/50 p-3 rounded-lg border border-gray-100">
                   <span className="text-gray-800 font-semibold">{split.user?.username || split.user?.email}</span>
-                  <span className="font-extrabold text-gray-900">${split.amount_owed.toFixed(2)}</span>
+                  <span className="font-extrabold text-gray-900">₹{split.amount_owed.toFixed(2)}</span>
                 </li>
               ))}
             </ul>

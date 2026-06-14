@@ -273,7 +273,7 @@ export default function GroupDetails() {
               <h2 className="text-lg font-bold text-gray-800 uppercase tracking-wider text-xs">Group Expenses</h2>
               <div className="text-right">
                 <span className="text-sm text-gray-500 font-medium">Total Spent: </span>
-                <span className="text-xl font-extrabold text-gray-900">${totalGroupExpenses.toFixed(2)}</span>
+                <span className="text-xl font-extrabold text-gray-900">₹{totalGroupExpenses.toFixed(2)}</span>
               </div>
             </div>
             
@@ -298,7 +298,7 @@ export default function GroupDetails() {
                     </div>
                     <div className="text-right">
                       <div className="font-extrabold text-gray-900 text-lg">
-                        ${exp.amount.toFixed(2)}
+                        {exp.currency === "USD" ? "$" : "₹"}{(exp.original_amount || exp.amount).toFixed(2)}
                       </div>
                       <div className="text-xs text-gray-400 font-medium mt-0.5 uppercase tracking-wide">
                         {exp.split_type}
