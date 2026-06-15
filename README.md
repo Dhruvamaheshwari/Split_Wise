@@ -53,6 +53,36 @@ Managing shared expenses among friends, roommates, or travel buddies can be comp
 
 ---
 
+## 📸 Application Walkthrough & Visuals
+
+A product is only as good as its user experience. This application was built from the ground up with a **premium, mobile-responsive glassmorphic UI**. Here is a guided visual tour demonstrating the core workflows:
+
+### 1. The Dashboard (Command Center)
+*Upon logging in, users are greeted with a sleek dashboard. Here they can view all active groups, create new groups, or trigger the CSV import engine. The UI utilizes custom CSS variables to deliver a perfectly balanced dark mode with neon accents.*
+![Dashboard View](./frontend/image/Screenshot%202026-06-15%20070054.png)
+![Dashboard Secondary](./frontend/image/Screenshot%202026-06-15%20070126.png)
+
+### 2. Group Passbook & Automated Debt Calculation
+*Inside a group, the financial health is immediately visible. The 'Settlement Summary' automatically calculates and displays who owes what, while the 'Passbook' tracks a chronological history of all group activities.*
+![Group Details Passbook](./frontend/image/Screenshot%202026-06-15%20070140.png)
+![Balances Overview](./frontend/image/Screenshot%202026-06-15%20070159.png)
+
+### 3. Dynamic Expense Splitting
+*Logging an expense is highly intuitive. Users can switch between 'Equal', 'Unequal', and 'Percentage' split methods. The UI dynamically adjusts to collect the required data, ensuring inputs always match the total amount.*
+![Add Expense Form](./frontend/image/Screenshot%202026-06-15%20070211.png)
+![Custom Splitting Interface](./frontend/image/Screenshot%202026-06-15%20070223.png)
+
+### 4. Resolving Debts & Digital Receipts
+*The 'Settle Up' feature simplifies paying back friends. Once a debt is settled, the system generates a detailed, beautifully designed 'Digital Receipt' for transparent record-keeping.*
+![Settle Up Form](./frontend/image/Screenshot%202026-06-15%20070234.png)
+![Digital Receipt Details](./frontend/image/Screenshot%202026-06-15%20070249.png)
+
+### 5. Live Expense Discussions
+*Communication is key in finance. Every transaction features a dedicated, real-time discussion thread where members can clarify bills, share UPI IDs, or confirm received payments.*
+![Live Chat Interface](./frontend/image/Screenshot%202026-06-15%20070305.png)
+
+---
+
 ## 🛠️ Technology Stack & Architecture
 
 **Frontend:**
