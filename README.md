@@ -47,7 +47,8 @@ Managing shared expenses among friends, roommates, or travel buddies can be comp
 - **Glassmorphism:** Modern UI with frosted glass panels, subtle gradients, and smooth hover animations.
 - **Responsive Design:** Works flawlessly on Mobile, Tablet, and Desktop.
 
-### 📄 7. Export Functionality
+### 📄 7. Import & Export Functionality
+- **CSV & Excel Import Engine:** Robust in-memory file parser (using `multer` and `xlsx`) that allows users to upload raw expense data. It features real-time anomaly detection, automatically sanitizing data (fixing commas, handling negative amounts, filling missing currencies) and generating a detailed "Processing Report" UI for the user.
 - **CSV Export:** Instantly download a `.csv` file containing all transaction histories and current balances for offline record-keeping.
 
 ---

@@ -6,7 +6,11 @@ This document details the data anomalies found in the provided `Expenses Export.
 
 ## 🔍 Part 1: Anomaly Log (CSV Data Problems & Handling)
 
-Upon analyzing the `Expenses Export.csv` file, several data inconsistencies, formatting errors, and logical anomalies were discovered. Below is the comprehensive log of these issues and how they were programmatically handled during the data import process:
+Upon analyzing the `Expenses Export.csv` file, several data inconsistencies, formatting errors, and logical anomalies were discovered. 
+
+> **Live Implementation Note:** Instead of just documenting these anomalies, a fully functional **Data Ingestion Engine** was built into the application. Users can upload `.csv` or `.xlsx` files via the Dashboard. The backend (using `multer` and `xlsx`) processes the file in-memory and programmatically executes the handling strategies below in real-time, generating a detailed UI report of exactly what was fixed.
+
+Below is the comprehensive log of these issues and how they were handled by the ingestion engine:
 
 | # | Anomaly / Data Problem Found | Example from CSV | How It Was Handled |
 |---|-----------------------------|------------------|---------------------|

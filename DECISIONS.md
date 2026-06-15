@@ -120,3 +120,18 @@ We engineered a custom `vercel.json` configuration file at the root of the front
 }
 ```
 This forces Vercel's edge network to route all traffic back to `index.html`, allowing React Router to successfully take over the routing logic on the client side, completely eliminating the 404 refresh bugs.
+
+---
+
+## 📊 7. Data Ingestion & File Parsing
+
+### The Problem
+The assignment required ingesting a `.csv` file, analyzing anomalies, and generating a report. We needed a way to accept file uploads without cluttering the server's disk space, while also supporting common user behaviors (like uploading `.xlsx` instead of `.csv`).
+
+### The Decision & Rationale
+We implemented **In-Memory Parsing using `multer` and `xlsx`**.
+Instead of saving the uploaded files to disk (`dest: 'uploads/'`), which introduces massive security and storage issues in serverless environments, we utilized `multer.memoryStorage()`. This keeps the file temporarily in RAM as a Buffer.
+
+We chose the `xlsx` package over a standard `csv-parser` because it seamlessly reads both `.csv` and Excel formats directly from a Buffer without needing distinct parsers. 
+
+**Case-Sensitivity Challenge:** The `xlsx` parser preserves exact header casing (e.g., `Amount` vs `amount`). We engineered an automatic key-normalization loop that converts all headers to lowercase and replaces spaces with underscores before applying our anomaly validation rules, ensuring highly robust data ingestion regardless of how the user formats their spreadsheet columns.
