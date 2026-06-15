@@ -131,7 +131,7 @@ export default function CreateExpense() {
                 <select
                   value={currency}
                   onChange={(e) => setCurrency(e.target.value)}
-                  className="w-24 pl-3 pr-8 py-3 bg-white/50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 font-bold"
+                  className="w-24 pl-3 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 font-bold shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]"
                 >
                   <option value="INR">INR</option>
                   <option value="USD">USD</option>
@@ -146,7 +146,7 @@ export default function CreateExpense() {
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
-                    className="w-full pl-10 pr-4 py-3 bg-white/50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 text-2xl font-bold"
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/30 text-2xl font-bold shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]"
                     required
                   />
                 </div>
@@ -162,7 +162,7 @@ export default function CreateExpense() {
                     type="button"
                     onClick={() => setSplitType(type)}
                     className={`flex-1 py-2 text-sm font-bold rounded-lg capitalize transition-all ${
-                      splitType === type ? "bg-white text-primary-600 shadow-sm" : "text-gray-500 hover:text-gray-800 hover:bg-gray-200"
+                      splitType === type ? "bg-gray-50 text-primary-600 shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]" : "text-gray-500 hover:text-gray-800 hover:bg-gray-200"
                     }`}
                   >
                     {type.toLowerCase()}
@@ -172,11 +172,11 @@ export default function CreateExpense() {
             </div>
 
             {splitType !== "EQUAL" && (
-              <div className="mb-8 bg-gray-50/80 p-5 rounded-xl border border-gray-100 animate-fade-in">
+              <div className="mb-8 bg-gray-100 p-5 rounded-xl border border-gray-200 shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] animate-fade-in">
                 <h3 className="font-semibold text-gray-800 mb-4 capitalize text-sm tracking-wide">Enter {splitType.toLowerCase()}</h3>
                 <div className="space-y-3">
                   {members.map((member) => (
-                    <div key={member.user_id} className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-50">
+                    <div key={member.user_id} className="flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm border border-gray-100">
                       <span className="text-gray-800 font-medium">{member.user?.username || member.user?.email}</span>
                       <div className="relative w-32">
                         <input

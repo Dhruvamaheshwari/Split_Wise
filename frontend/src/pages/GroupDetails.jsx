@@ -238,7 +238,7 @@ export default function GroupDetails() {
               </p>
               
               <div className="flex flex-wrap gap-4 mt-2">
-                <button onClick={() => navigate(`/group/${groupId}/expense/new`)} className="bg-white text-gray-900 hover:bg-gray-100 shadow-xl font-bold px-7 py-3 rounded-2xl transition-transform hover:-translate-y-1">
+                <button onClick={() => navigate(`/group/${groupId}/expense/new`)} className="bg-white text-black hover:bg-slate-100 shadow-xl font-bold px-7 py-3 rounded-2xl transition-transform hover:-translate-y-1">
                   Add Expense
                 </button>
                 <button onClick={() => navigate(`/settle?group=${groupId}`)} className="bg-primary-500 hover:bg-primary-400 border border-primary-400 text-white shadow-xl font-bold px-7 py-3 rounded-2xl transition-transform hover:-translate-y-1">
@@ -301,18 +301,18 @@ export default function GroupDetails() {
 
                     if (memberDebts.length > 0) {
                       return memberDebts.map((debt, idx) => (
-                        <li key={`debt-${m.user_id}-${idx}`} className="flex items-center justify-between p-4 bg-rose-50/30 rounded-xl border border-rose-100">
+                        <li key={`debt-${m.user_id}-${idx}`} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-rose-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-xs">
+                            <div className="w-8 h-8 rounded-full bg-rose-500/10 text-rose-500 flex items-center justify-center font-bold text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
                               {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
                             </div>
-                            <span className="text-gray-600 font-medium text-sm">
+                            <span className="text-gray-500 font-medium text-sm">
                               <span className="font-bold text-gray-900">{m.user?.username || m.user?.email}</span> owes <span className="font-bold text-gray-900">{getUserName(debt.toUserId)}</span>
                             </span>
                           </div>
                           <div className="text-right">
-                            <div className="font-mono-num font-black text-rose-600 text-lg mb-1">₹{debt.amount.toFixed(2)}</div>
-                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-rose-500 bg-rose-100 px-2 py-0.5 rounded-full">
+                            <div className="font-mono-num font-black text-rose-500 text-lg mb-1">₹{debt.amount.toFixed(2)}</div>
+                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20">
                               Not Paid ❌
                             </span>
                           </div>
@@ -323,18 +323,18 @@ export default function GroupDetails() {
                     if (memberCredits.length > 0) {
                       const totalCredit = memberCredits.reduce((sum, b) => sum + b.amount, 0);
                       return (
-                        <li key={`credit-${m.user_id}`} className="flex items-center justify-between p-4 bg-blue-50/30 rounded-xl border border-blue-100">
+                        <li key={`credit-${m.user_id}`} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-blue-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs">
+                            <div className="w-8 h-8 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
                               {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
                             </div>
-                            <span className="text-gray-600 font-medium text-sm">
+                            <span className="text-gray-500 font-medium text-sm">
                               <span className="font-bold text-gray-900">{m.user?.username || m.user?.email}</span> (Owed money)
                             </span>
                           </div>
                           <div className="text-right">
-                            <div className="font-mono-num font-black text-blue-600 text-lg mb-1">₹{totalCredit.toFixed(2)}</div>
-                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-blue-500 bg-blue-100 px-2 py-0.5 rounded-full">
+                            <div className="font-mono-num font-black text-blue-500 text-lg mb-1">₹{totalCredit.toFixed(2)}</div>
+                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-md border border-blue-500/20">
                               Receiving ⏳
                             </span>
                           </div>
@@ -349,17 +349,17 @@ export default function GroupDetails() {
 
                     if (!hasParticipated) {
                       return (
-                        <li key={`new-${m.user_id}`} className="flex items-center justify-between p-4 bg-purple-50/30 dark:bg-purple-900/10 rounded-xl border border-purple-100 dark:border-purple-900/30">
+                        <li key={`new-${m.user_id}`} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-purple-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-xs">
+                            <div className="w-8 h-8 rounded-full bg-purple-500/10 text-purple-500 flex items-center justify-center font-bold text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
                               {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
                             </div>
-                            <span className="font-bold text-gray-900 dark:text-white text-sm">
+                            <span className="font-bold text-gray-900 text-sm">
                               {m.user?.username || m.user?.email}
                             </span>
                           </div>
                           <div className="text-right">
-                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30 px-2 py-0.5 rounded-full">
+                            <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-purple-500 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">
                               New Member 
                             </span>
                           </div>
@@ -368,17 +368,17 @@ export default function GroupDetails() {
                     }
 
                     return (
-                      <li key={`settled-${m.user_id}`} className="flex items-center justify-between p-4 bg-emerald-50/30 dark:bg-emerald-900/10 rounded-xl border border-emerald-100 dark:border-emerald-900/30">
+                      <li key={`settled-${m.user_id}`} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-emerald-500/20 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-xs">
+                          <div className="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center font-bold text-xs shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
                             {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
                           </div>
-                          <span className="font-bold text-gray-900 dark:text-white text-sm">
+                          <span className="font-bold text-gray-900 text-sm">
                             {m.user?.username || m.user?.email}
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 rounded-full">
+                          <span className="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
                             Paid ✅
                           </span>
                         </div>
@@ -395,12 +395,12 @@ export default function GroupDetails() {
             <h2 className="text-lg font-bold text-gray-800 dark:text-white mb-4 uppercase tracking-wider text-xs">Group Members</h2>
             <ul className="space-y-3">
               {group.members?.map((m) => (
-                <li key={m.user_id} className="flex justify-between items-center bg-gray-50 dark:bg-slate-700/50 p-3 rounded-lg border border-gray-100 dark:border-slate-700">
+                <li key={m.user_id} className="flex justify-between items-center bg-gray-50 p-3 rounded-xl border border-gray-100 shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary-100 dark:bg-slate-600 text-primary-700 dark:text-primary-300 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center font-bold shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
                       {(m.user?.username || m.user?.email || "?")[0].toUpperCase()}
                     </div>
-                    <span className="font-medium text-gray-800 dark:text-gray-200">{m.user?.username || m.user?.email}</span>
+                    <span className="font-medium text-gray-800">{m.user?.username || m.user?.email}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {m.role === "creator" && (
@@ -481,11 +481,11 @@ export default function GroupDetails() {
                     <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                       <div className="flex items-end gap-2 max-w-[85%]">
                         {!isMe && (
-                          <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-slate-600 text-primary-700 dark:text-primary-300 flex-shrink-0 flex items-center justify-center text-[10px] font-bold">
+                          <div className="w-6 h-6 rounded-full bg-primary-100 text-primary-700 flex-shrink-0 flex items-center justify-center text-[10px] font-bold shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]">
                             {(msg.user?.username || msg.user?.email || "?")[0].toUpperCase()}
                           </div>
                         )}
-                        <div className={`p-3 rounded-2xl text-sm ${isMe ? 'bg-primary-600 text-white rounded-br-sm' : 'bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200 rounded-bl-sm'}`}>
+                        <div className={`p-3 rounded-2xl text-sm ${isMe ? 'bg-primary-600 text-white rounded-br-sm shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]' : 'bg-gray-100 text-gray-800 rounded-bl-sm shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]'}`}>
                           <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                         </div>
                       </div>
@@ -505,7 +505,7 @@ export default function GroupDetails() {
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 px-4 py-2 border border-gray-200 dark:border-slate-600 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm bg-gray-50 dark:bg-slate-700 dark:text-white transition-all hover:bg-white dark:hover:bg-slate-600"
+                className="flex-1 px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm bg-gray-50 text-gray-900 transition-all shadow-[inset_0_1px_1px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] hover:bg-gray-100"
               />
               <button
                 type="submit"
@@ -540,15 +540,15 @@ export default function GroupDetails() {
             ) : (
               <div className="space-y-4">
                 {expenses.map((exp) => (
-                  <div key={exp.id} className="group relative flex justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-lg hover:border-primary-100 dark:hover:border-primary-500/50 transition-all cursor-pointer overflow-hidden" onClick={() => navigate(`/expense/${exp.id}`)}>
+                  <div key={exp.id} className="group relative flex justify-between items-center bg-white dark:bg-slate-800/90 p-5 rounded-2xl border border-gray-100 dark:border-slate-700/50 shadow-sm dark:shadow-[inset_0_2px_4px_rgba(255,255,255,0.05),_0_4px_6px_rgba(0,0,0,0.2)] hover:shadow-lg dark:hover:shadow-[inset_0_2px_4px_rgba(255,255,255,0.1),_0_10px_15px_rgba(0,0,0,0.4)] hover:border-primary-100 dark:hover:border-primary-500/50 transition-all cursor-pointer overflow-hidden" onClick={() => navigate(`/expense/${exp.id}`)}>
                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary-400 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <div className="flex items-center gap-5">
-                      <div className="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-slate-700 text-primary-600 dark:text-primary-400 flex flex-col items-center justify-center font-bold shadow-sm group-hover:bg-primary-50 dark:group-hover:bg-slate-600 transition-colors">
-                        <span className="text-xs font-semibold uppercase text-gray-400">{new Date(exp.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
-                        <span className="text-lg leading-none mt-0.5">{new Date(exp.created_at).getDate()}</span>
+                      <div className="w-12 h-12 rounded-2xl bg-gray-100 text-primary-600 flex flex-col items-center justify-center font-bold shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] group-hover:bg-gray-200 transition-colors">
+                        <span className="text-xs font-semibold uppercase text-gray-500">{new Date(exp.created_at).toLocaleDateString('en-US', { month: 'short' })}</span>
+                        <span className="text-lg leading-none mt-0.5 text-gray-900">{new Date(exp.created_at).getDate()}</span>
                       </div>
                       <div>
-                        <h3 className="font-extrabold text-gray-900 text-lg group-hover:text-primary-700 transition-colors">{exp.description}</h3>
+                        <h3 className="font-extrabold text-gray-900 text-lg group-hover:text-primary-600 transition-colors">{exp.description}</h3>
                         <p className="text-sm text-gray-500 mt-0.5 font-medium">
                           Paid by <span className="font-bold text-gray-700">{exp.paid_by?.username || exp.paid_by?.email}</span>
                         </p>
@@ -558,7 +558,7 @@ export default function GroupDetails() {
                       <div className="font-mono-num font-black text-gray-900 text-xl">
                         {exp.currency === "USD" ? "$" : "₹"}{(exp.original_amount || exp.amount).toFixed(2)}
                       </div>
-                      <div className="inline-block px-2 py-0.5 mt-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider rounded-md">
+                      <div className="inline-block px-2 py-0.5 mt-1 bg-gray-100 text-gray-600 text-[10px] font-bold uppercase tracking-wider rounded-md border border-transparent dark:border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
                         {exp.split_type}
                       </div>
                     </div>
